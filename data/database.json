@@ -30,7 +30,7 @@
   "seats": [
     {
       "seat_id": "seat1",
-      "physical_status": "available"
+      "is_broken": false
     }
   ],
   "quotas": [
