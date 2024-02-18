@@ -25,20 +25,17 @@
             ]
         }
     },
-    "seats": [
-        {
-            "id": 1,
+    "seats": {
+        "1": {
             "is_broken": false
         },
-        {
-            "id": 2,
+        "2": {
             "is_broken": true
         },
-        {
-            "id": 3,
+        "3": {
             "is_broken": false
         }
-    ],
+    },
     "quotas": {
         "company1": {
             "total_quota": 100,

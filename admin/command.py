@@ -1,7 +1,7 @@
 from telegram.ext import Application, CommandHandler, CallbackContext, ConversationHandler, MessageHandler, filters
-from ..data.data import load_data, save_data
+from data.data import load_data, save_data
 from telegram import Update, KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove
-# from general_command import cancel
+from general_command import cancel
 
 date_format_example = "YYYY-MM-DD"
 
@@ -9,10 +9,10 @@ date_format_example = "YYYY-MM-DD"
 async def add_seat(update: Update, context: CallbackContext) -> int:
     """Adds a seat to the database."""
     data = load_data()
-    data["seats"].append({
-        "id": len(data["seats"]) + 1,
+    seat_id = str(len(data["seats"]) + 1)
+    data["seats"][seat_id] = {
         "is_broken": False
-    })
+    }
     save_data(data)
     await update.message.reply_text(f"Seat {len(data['seats'])} added successfully.")
     return ConversationHandler.END
@@ -26,12 +26,12 @@ async def mark_seat_as_broken(update:Update, context: CallbackContext) -> int:
         await update.message.reply_text("No seat ID provided.")
         return ConversationHandler.END
 
-    seat_id = int(context.args[0])
-    if seat_id < 1 or seat_id > len(data["seats"]):
+    seat_id = context.args[0]
+    if seat_id not in data["seats"]:
         await update.message.reply_text(f"Seat {seat_id} does not exist.")
         return ConversationHandler.END
     
-    data["seats"][seat_id - 1]["is_broken"] = True
+    data["seats"][seat_id]["is_broken"] = True
     save_data(data)
     await update.message.reply_text(f"Seat {seat_id} marked as broken.")
     return ConversationHandler.END
@@ -63,8 +63,17 @@ COMPANY_NAME, COMPANY_PASSWORD, COMPANY_QUOTA = range(3)
 
 async def add_company(update: Update, context: CallbackContext) -> int:
     """Starts the conversation to add a new company."""
-    await update.message.reply_text("Please enter the name of the new company:")
-    return COMPANY_NAME
+    company_name = update.message.text
+    data = load_data()
+    # Check if the company name already exists in the database
+    # This is a placeholder, replace it with your actual database logic
+    if company_name in data["companies"]:
+        await update.message.reply_text("A company with this name already exists. Please try again with a different name.")
+        return ConversationHandler.END
+
+    await update.message.reply_text("Please enter the password for the new company:")
+    context.user_data['company_name'] = company_name
+    return COMPANY_PASSWORD
 
 async def company_name(update: Update, context: CallbackContext) -> int:
     """Stores the company name and asks for the password."""
@@ -81,26 +90,56 @@ async def company_password(update: Update, context: CallbackContext) -> int:
 async def company_quota(update: Update, context: CallbackContext) -> int:
     """Stores the company quota and ends the conversation."""
     context.user_data['company_quota'] = update.message.text
+
+    # Add the company to the database
+    # This is a placeholder, replace it with your actual database logic
+    company_id = context.user_data['company_id']
+    company_name = context.user_data['company_name']
+    company_password = context.user_data['company_password']
+    company_quota = context.user_data['company_quota']
+    add_company_to_database(company_id, company_name, company_password, company_quota)
+
     await update.message.reply_text("Company added successfully!")
-    # Here you would typically add the company to your database
     return ConversationHandler.END
+
+async def add_company_to_database(company_id, company_name, company_password, company_quota):
+    data = load_data()
+
+    num_companies = len(data["companies"])
+    data["companies"][num_companies + 1] = {
+        
+        "name": company_name,
+        "password": company_password,
+        "quota": company_quota
+    }
+    save_data(data)
+
+add_company_handler = ConversationHandler(
+    entry_points=[CommandHandler('add_company', add_company)],
+    states={
+        COMPANY_NAME: [MessageHandler(filters.TEXT & ~filters.COMMAND, company_name)],
+        COMPANY_PASSWORD: [MessageHandler(filters.TEXT & ~filters.COMMAND, company_password)],
+        COMPANY_QUOTA: [MessageHandler(filters.TEXT & ~filters.COMMAND, company_quota)]
+    },
+    fallbacks=[CommandHandler('cancel', cancel)],
+)
 
 # 5. Delete company (by company id)
 async def delete_company(update: Update, context: CallbackContext) -> None:
     """Deletes a company from the database."""
     if not context.args:
-        await update.message.reply_text("No company name provided.")
+        await update.message.reply_text("No company ID provided.")
         return
     
-    company_name = context.args[0]
+    company_id = context.args[0]
     data = load_data()
-    if company_name not in data["companies"]:
-        await update.message.reply_text(f"Company {company_name} does not exist.")
+    if company_id not in data["companies"]:
+        await update.message.reply_text(f"Company {company_id} does not exist.")
         return
     
-    del data["companies"][company_name]
+    del data["companies"][company_id]
     save_data(data)
-    await update.message.reply_text(f"Company {company_name} deleted successfully.")
+    await update.message.reply_text(f"Company {company_id} deleted successfully.")
 
 # 6. Edit company (by company id, edit quota/password)
 # Define states
@@ -112,7 +151,17 @@ async def edit_company(update: Update, context: CallbackContext) -> int:
 
 async def company_id(update: Update, context: CallbackContext) -> int:
     """Stores the company id and asks what field to edit."""
-    context.user_data['company_id'] = update.message.text
+    company_id = update.message.text
+
+    # Load data
+    data = load_data()
+    num_companies = len(data["companies"])
+    if company_id < 1 or company_id > num_companies or company_id not in data["companies"]:
+        await update.message.reply_text(f"Company {company_id} does not exist.")
+        return ConversationHandler.END
+    # Store the data in context.user_data
+    context.user_data['company_data'] = data
+
     await update.message.reply_text("Enter 'name' to edit name, 'password' to edit password, 'quota' to edit quota:")
     return EDIT_FIELD
 
@@ -141,6 +190,8 @@ async def edit_field(update: Update, context: CallbackContext) -> int:
 async def edit_name(update: Update, context: CallbackContext) -> int:
     """Edits the company name."""
     # Here you would typically edit the company name in your database
+    company_id = context.user_data['company_id']
+
     await update.message.reply_text("Company name edited successfully! Do you want to continue editing? (yes/no)")
     return EDIT_FIELD
 
@@ -166,8 +217,26 @@ edit_company_handler = ConversationHandler(
         EDIT_PASSWORD: [MessageHandler(filters.TEXT & ~filters.COMMAND, edit_password)],
         EDIT_QUOTA: [MessageHandler(filters.TEXT & ~filters.COMMAND, edit_quota)]
     },
-    # fallbacks=[CommandHandler('cancel', cancel)],  # You would need to define a 'cancel' function
+    fallbacks=[CommandHandler('cancel', cancel)],  # You would need to define a 'cancel' function
 )
 
 #view companies (total quota, current quota used, company name, company password)
+async def view_all_companies(update: Update, context: CallbackContext) -> None:
+    """Displays information about all companies."""
+    data = load_data()
+    for company in data["companies"]:
+        await update.message.reply_text(f"Name: {company['name']}, Password: {company['password']}, Quota: {company['quota']}")
 
+#view info of a particular company
+async def view_company(update: Update, context: CallbackContext) -> None:
+    """Displays information about a specific company."""
+    if not context.args:
+        await update.message.reply_text("No company ID provided.")
+        return
+    company_id = context.args[0]
+    data = load_data()
+    if company_id not in data["companies"]:
+        await update.message.reply_text(f"Company {company_id} does not exist.")
+        return
+    company = data["companies"][company_id]
+    await update.message.reply_text(f"Name: {company['name']}, Password: {company['password']}, Quota: {company['quota']}")
