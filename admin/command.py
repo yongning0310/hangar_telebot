@@ -134,7 +134,7 @@ async def date(update: Update, context: CallbackContext) -> int:
     await update.message.reply_text(f"Available seats for {date_str}.")
     all_hours = data["dates"][date_str]
     seats_data = data["seats"]
-
+    message = ""
     for hour, seats_dict in all_hours.items():
         available_seats = [
             seat_id for seat_id, seat_info in seats_dict.items()
@@ -142,11 +142,11 @@ async def date(update: Update, context: CallbackContext) -> int:
         ]
         available_seats_str = ", ".join(available_seats)
         if available_seats:
-            await update.message.reply_text(f"Hour: {hour}, Available seats: {available_seats_str}")
+            message += f"Hour: {hour}, Available seats: {available_seats_str}\n"
         else:
-            await update.message.reply_text(f"Hour: {hour}, No available seats.")
+            message += f"Hour: {hour}, No available seats.\n"
+    await update.message.reply_text(message)
     return ConversationHandler.END
-
 
 async def cancel_view_avail_seats(update: Update, context: CallbackContext) -> int:
     await update.message.reply_text('View Available Seats canceled.', reply_markup=ReplyKeyboardRemove())
