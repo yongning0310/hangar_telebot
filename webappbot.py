@@ -1,10 +1,12 @@
 #!/usr/bin/env python
+
 import json
 import logging
 from telegram import Update, KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove, WebAppInfo
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters, CallbackContext, ConversationHandler
-from data.data import load_data
+from data.data import load_data, save_data
 from general_command import ADMIN_PASSWORD, COMPANY_NAME, COMPANY_PASSWORD, admin_password_check, company_name_check, company_password_check, start, admin_login, company_login, cancel
+from admin.command import add_seat, mark_seat_as_broken, view_avail_seats, edit_company_handler
 from config import TOKEN
 
 
@@ -41,8 +43,10 @@ def main():
     data = load_data()
 
     # # Placeholder handlers for admin and company commands
-    # application.add_handler(CommandHandler("add_company", add_company))
-    # application.add_handler(CommandHandler("edit_quota", edit_quota))
+    application.add_handler(CommandHandler("add_seat", add_seat))
+    application.add_handler(CommandHandler("mark_seat_as_broken", mark_seat_as_broken))
+    application.add_handler(CommandHandler("view_avail_seats", view_avail_seats))
+    application.add_handler(edit_company_handler)
     # application.add_handler(CommandHandler("book_seat", book_seat))
 
     application.run_polling()
