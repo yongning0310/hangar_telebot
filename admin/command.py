@@ -76,21 +76,29 @@ COMPANY_NAME, COMPANY_PASSWORD, COMPANY_QUOTA = range(3)
 
 async def add_company(update: Update, context: CallbackContext) -> int:
     """Starts the conversation to add a new company."""
-    company_name = update.message.text
+    context.user_data['company_id'] = str(len(load_data()["companies"]) + 1)
+    await update.message.reply_text("Please enter the name for the new company:")
+    return COMPANY_NAME
+def add_company_and_quota_to_database(company_id, company_name, company_password, company_quota):
     data = load_data()
-    # Check if the company name already exists in the database
-    # This is a placeholder, replace it with your actual database logic
-    if company_name in data["companies"]:
-        await update.message.reply_text("A company with this name already exists. Please try again with a different name.")
-        return ConversationHandler.END
-
-    await update.message.reply_text("Please enter the password for the new company:")
-    context.user_data['company_name'] = company_name
-    return COMPANY_PASSWORD
+    data["companies"][company_id] = {
+        "name": company_name,
+        "password": company_password
+    }
+    data["quotas"][company_id] = {
+        "total_quota": company_quota,
+        "quota_used": 0
+    }
+    save_data(data)
 
 async def company_name(update: Update, context: CallbackContext) -> int:
     """Stores the company name and asks for the password."""
+    company_name = update.message.text
+    if company_name in load_data()["companies"]:
+        await update.message.reply_text("Company name already exists. Please enter a different name.")
+        return COMPANY_NAME
     context.user_data['company_name'] = update.message.text
+
     await update.message.reply_text("Please enter the company password:")
     return COMPANY_PASSWORD
 
@@ -103,29 +111,18 @@ async def company_password(update: Update, context: CallbackContext) -> int:
 async def company_quota(update: Update, context: CallbackContext) -> int:
     """Stores the company quota and ends the conversation."""
     context.user_data['company_quota'] = update.message.text
-
+    data = load_data()
     # Add the company to the database
     # This is a placeholder, replace it with your actual database logic
     company_id = context.user_data['company_id']
     company_name = context.user_data['company_name']
     company_password = context.user_data['company_password']
     company_quota = context.user_data['company_quota']
-    add_company_to_database(company_id, company_name, company_password, company_quota)
+
+    add_company_and_quota_to_database(company_id, company_name, company_password, company_quota)
 
     await update.message.reply_text("Company added successfully!")
     return ConversationHandler.END
-
-async def add_company_to_database(company_id, company_name, company_password, company_quota):
-    data = load_data()
-
-    num_companies = len(data["companies"])
-    data["companies"][num_companies + 1] = {
-        
-        "name": company_name,
-        "password": company_password,
-        "quota": company_quota
-    }
-    save_data(data)
 
 add_company_handler = ConversationHandler(
     entry_points=[CommandHandler('add_company', add_company)],
@@ -138,21 +135,35 @@ add_company_handler = ConversationHandler(
 )
 
 # 5. Delete company (by company id)
+DEL_COMPANY_ID = range(1)
 async def delete_company(update: Update, context: CallbackContext) -> None:
-    """Deletes a company from the database."""
-    if not context.args:
-        await update.message.reply_text("No company ID provided.")
-        return
-    
-    company_id = context.args[0]
+    """Starts delete conversation."""
+    await update.message.reply_text("Please enter the id of the company to delete:")
+    return DEL_COMPANY_ID
+
+async def delete_company_id(update: Update, context: CallbackContext) -> int:
+    """Deletes the company id if valid"""
+    company_id = update.message.text
+
+    # Load data
     data = load_data()
+
     if company_id not in data["companies"]:
-        await update.message.reply_text(f"Company {company_id} does not exist.")
-        return
-    
-    del data["companies"][company_id]
-    save_data(data)
-    await update.message.reply_text(f"Company {company_id} deleted successfully.")
+        await update.message.reply_text(f"Company {company_id} does not exist. Enter a valid company id.")
+        return DEL_COMPANY_ID
+
+    context.user_data['company_id'] = company_id
+    await update.message.reply_text("Deleted successfully.")
+    return ConversationHandler.END
+
+# Define the conversation handler
+delete_company_handler = ConversationHandler(
+    entry_points=[CommandHandler('delete_company', delete_company)],
+    states={
+        DEL_COMPANY_ID: [MessageHandler(filters.TEXT & ~filters.COMMAND, delete_company_id)],
+    },
+    fallbacks=[CommandHandler('cancel', cancel)],  # You would need to define a 'cancel' function
+)
 
 # 6. Edit company (by company id, edit quota/password)
 # Define states
