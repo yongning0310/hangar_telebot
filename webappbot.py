@@ -6,12 +6,13 @@ from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandl
 from data.data import load_data, save_data
 from general_command import start, admin_login, company_login
 from message_handler import handle_message
+from config import TOKEN
 
 logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 def main():
-    application = Application.builder().token("TOKEN").build()
+    application = Application.builder().token(TOKEN).build()
 
     # Command handlers
     application.add_handler(CommandHandler("start", start))
