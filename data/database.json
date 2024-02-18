@@ -1,72 +1,1664 @@
 {
-  "admin": [
-    {
-      "id": "admin1",
-      "password": "hangar_admin"
-    }
-  ],
-  "companies": {
-    "1": {
-      "id": "1",
-      "name": "Company A",
-      "password": "company1"
-    },
-    "2": {
-      "id": "2",
-      "name": "Company B",
-      "password": "company2"
-    }
-  },
-  "dates": {
-    "2024-02-20": {
-      "09:00": {
-        "1": {
-          "is_booked": false
+    "admin": [
+        {
+            "id": "admin1",
+            "password": "hangar_admin"
         }
-      }
-    }
-  },
-  "seats": {
-    "1": {
-      "is_broken": false
-    },
-    "2": {
-      "is_broken": true
-    },
-    "3": {
-      "is_broken": false
-    },
-    "4": {
-      "is_broken": true
-    },
-    "5": {
-      "is_broken": false
-    }
-  },
-  "quotas": {
-    "1": {
-      "total_quota": 100,
-      "quota_used": 95
-    },
-    "2": {
-      "total_quota": 50,
-      "quota_used": 50
-    }
-  },
-  "bookings": {
-    "1": [
-      {
-        "date": "2024-02-20",
-        "hour": "09:00",
-        "seat_id": "seat1"
-      }
     ],
-    "2": [
-      {
-        "date": "2024-02-20",
-        "hour": "09:00",
-        "seat_id": "seat2"
-      }
-    ]
-  }
+    "companies": {
+        "1": {
+            "id": "1",
+            "name": "Company A",
+            "password": "company1"
+        },
+        "3": {
+            "id": "3",
+            "name": "omee",
+            "password": "123"
+        }
+    },
+    "dates": {
+        "2024-02-20": {
+            "09:00": {
+                "1": {
+                    "is_booked": false
+                }
+            }
+        },
+        "2024-02-18": {
+            "00:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "01:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "02:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "03:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "04:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "05:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "06:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "07:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "08:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "09:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "10:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "11:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "12:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "13:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "14:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "15:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "16:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "17:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "18:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "19:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "20:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "21:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "22:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "23:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            }
+        },
+        "2024-02-19": {
+            "00:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "01:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "02:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "03:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "04:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "05:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "06:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "07:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "08:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "09:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "10:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "11:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "12:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "13:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "14:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "15:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "16:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "17:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "18:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "19:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "20:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "21:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "22:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "23:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            }
+        },
+        "2024-02-21": {
+            "00:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "01:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "02:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "03:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "04:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "05:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "06:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "07:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "08:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "09:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "10:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "11:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "12:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "13:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "14:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "15:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "16:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "17:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "18:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "19:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "20:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "21:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "22:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "23:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            }
+        },
+        "2024-02-22": {
+            "00:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "01:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "02:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "03:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "04:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "05:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "06:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "07:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "08:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "09:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "10:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "11:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "12:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "13:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "14:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "15:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "16:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "17:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "18:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "19:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "20:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "21:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "22:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "23:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            }
+        },
+        "2024-02-23": {
+            "00:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "01:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "02:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "03:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "04:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "05:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "06:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "07:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "08:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "09:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "10:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "11:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "12:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "13:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "14:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "15:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "16:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "17:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "18:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "19:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "20:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "21:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "22:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "23:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            }
+        },
+        "2024-02-24": {
+            "00:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "01:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "02:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "03:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "04:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "05:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "06:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "07:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "08:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "09:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "10:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "11:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "12:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "13:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "14:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "15:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "16:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "17:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "18:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "19:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "20:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "21:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "22:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            },
+            "23:00": {
+                "1": {
+                    "is_booked": false
+                },
+                "3": {
+                    "is_booked": false
+                },
+                "5": {
+                    "is_booked": false
+                }
+            }
+        }
+    },
+    "seats": {
+        "1": {
+            "is_broken": false
+        },
+        "2": {
+            "is_broken": false
+        },
+        "3": {
+            "is_broken": true
+        },
+        "4": {
+            "is_broken": true
+        },
+        "5": {
+            "is_broken": false
+        },
+        "6": {
+            "is_broken": false
+        }
+    },
+    "quotas": {
+        "1": {
+            "total_quota": 100,
+            "quota_used": 95
+        },
+        "3": {
+            "total_quota": "100",
+            "quota_used": 0
+        }
+    },
+    "bookings": {
+        "1": [
+            {
+                "date": "2024-02-20",
+                "hour": "09:00",
+                "seat_id": "seat1"
+            }
+        ]
+    }
 }

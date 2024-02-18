@@ -50,7 +50,7 @@ async def book_seats(update: Update, context: CallbackContext) -> int:
     return ConversationHandler.END
 
 # 3. View existing bookings
-async def view_existing_bookings(update: Update, context: CallbackContext) -> int:
+async def view_my_bookings(update: Update, context: CallbackContext) -> int:
     if not check_if_logged_on_as_company(update, context):
         await update.message.reply_text("You are not logged in as a company.")
         return ConversationHandler.END

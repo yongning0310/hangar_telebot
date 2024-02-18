@@ -1,16 +1,17 @@
 #!/usr/bin/env python
 import json
 import logging
-from company.command import book_seats, check_quota, view_existing_bookings
+from company.command import book_seats, check_quota, view_my_bookings
 from telegram import Update, KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove, WebAppInfo
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters, CallbackContext, ConversationHandler
 from data.data import load_data, save_data
 from general_command import ADMIN_PASSWORD, COMPANY_NAME, COMPANY_PASSWORD, admin_password_check, company_name_check, company_password_check, start, admin_login, company_login, logout
-from admin.command import add_seat, mark_seat_as_broken, view_avail_seats, edit_company_handler
 from general_command import start, admin_login, company_login
 # from message_handler import handle_message
-from admin.command import add_seat, mark_seat_as_broken, view_avail_seats, add_company_handler, delete_company, edit_company_handler, view_all_companies, view_company, view_all_seats
+from admin.command import add_seat, add_company_handler, edit_company_handler, view_all_companies, view_company, view_all_seats, delete_company_handler, mark_seat_handler, view_avail_seats_handler
 from config import TOKEN
+from apscheduler.schedulers.background import BackgroundScheduler
+from datetime import datetime, timedelta
 
 
 logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO)
@@ -35,6 +36,32 @@ company_conversation_handler = ConversationHandler(
     fallbacks=[]
 )
 
+def add_new_dates():
+    # Adds new dates for the next 7 days to the database, initializing the seats for each date and hour
+    data = load_data()
+    dates = data['dates']
+    for i in range(7):
+        date = (datetime.now() + timedelta(days=i)).strftime('%Y-%m-%d')
+        if date not in dates:
+            dates[date] = {}
+            for hour in range(0, 24):
+                # Format the hour as a datetime string
+                hour_str = datetime.strptime(str(hour), "%H").strftime("%H:%M")
+                dates[date][hour_str] = {}
+                for seat_id in data['seats']:
+                    if data['seats'][seat_id]['is_broken'] == True:
+                        continue
+                    dates[date][hour_str][seat_id] = {"is_booked": False}
+    save_data(data)
+    # Clean up last week's dates
+    dates_to_delete = []
+    for date in dates:
+        if date < (datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d'):
+            dates_to_delete.append(date)
+    for date in dates_to_delete:
+        del dates[date]
+    
+
 def main():
     application = Application.builder().token(TOKEN).build()
 
@@ -47,21 +74,39 @@ def main():
 
     # # Placeholder handlers for admin and company commands
     application.add_handler(CommandHandler('add_seat', add_seat))
-    application.add_handler(CommandHandler('mark_seat_as_broken', mark_seat_as_broken))
-    application.add_handler(CommandHandler('view_avail_seats', view_avail_seats))
+    application.add_handler(mark_seat_handler)
+    application.add_handler(view_avail_seats_handler)
     application.add_handler(add_company_handler)
-    application.add_handler(CommandHandler('delete_company', delete_company))
+    application.add_handler(delete_company_handler)
     application.add_handler(edit_company_handler)
-    application.add_handler(CommandHandler('view_all_companies', view_all_companies))
-    application.add_handler(CommandHandler('view_company', view_company))
+    application.add_handler(CommandHandler('view_all_companies', view_all_companies)) 
+    application.add_handler(CommandHandler('view_company', view_company)) # edit this 
     application.add_handler(CommandHandler('view_all_seats', view_all_seats))
     # application.add_handler(CommandHandler("book_seat", book_seat))
         # # Placeholder handlers for admin and company commands
-    application.add_handler(CommandHandler("check_quota", check_quota))
-    application.add_handler(CommandHandler("book_seats", book_seats))
-    application.add_handler(CommandHandler("view_existing_bookings", view_existing_bookings))
+    application.add_handler(CommandHandler("check_quota", check_quota)) 
+    application.add_handler(CommandHandler("book_seats", book_seats)) # complete this
+    application.add_handler(CommandHandler("view_my_bookings", view_my_bookings))
 
+    # Start the scheduler
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(add_new_dates, 'interval', weeks=1, start_date=next_monday())
+    scheduler.start()
+
+    add_new_dates()
     application.run_polling()
+
+def next_monday():
+    # Get the current date
+    now = datetime.now()
+
+    # Get the number of days until next Monday
+    days_until_monday = (7 - now.weekday() or 7)
+
+    # Get the date of next Monday
+    next_monday = now + timedelta(days=days_until_monday)
+
+    return next_monday
 
 if __name__ == "__main__":
     main()

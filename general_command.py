@@ -26,9 +26,21 @@ async def admin_password_check(update: Update, context: CallbackContext) -> int:
     """Checks the admin password."""
     text = update.message.text
     if text == data['admin'][0]['password']:  # Replace with your actual admin password
+        #how to have a multi-line message?
+
         await update.message.reply_text(
-            "Admin authenticated. Available commands: /seats, /companies"
+            "Admin authenticated. Available commands:\n"
+            "/add_seat - Add seat (For Admin).\n"
+            "/mark_seat_status - Mark seat as broken/ available (For Admin).\n"
+            "/view_avail_seats - View available seats (For Admin).\n"
+            "/edit_company - Edit a company (For Admin).\n"
+            "/add_company - Add a new company (For Admin).\n"
+            "/delete_company - Delete a company (For Admin).\n"
+            "/view_all_companies - List all companies (For Admin).\n"
+            "/view_company - View company details (For Admin).\n"
+            "/view_all_seats - List all seats (For Admin)."
         )
+
         context.user_data['role'] = 'admin'
         return ConversationHandler.END
     else:
@@ -53,7 +65,7 @@ async def company_name_check(update: Update, context: CallbackContext) -> int:
     #   "password": "company2"
     # }
     # i want to check if the company name is in the list of companies, regardless of upper or lower case
-
+    print(data["companies"])
     if text.lower() in [company["name"].lower() for company in data["companies"]]:
         # context.user_data["company"] should store the corresponding company object
         context.user_data["company"] = [company for company in data["companies"] if company["name"].lower() == text.lower()][0]
