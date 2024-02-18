@@ -1,7 +1,6 @@
 from telegram.ext import Application, CommandHandler, CallbackContext, ConversationHandler, MessageHandler, filters
 from data.data import load_data, save_data
 from telegram import Update, KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove
-from general_command import cancel
 
 #view quota (total and used)
 #view avail seats for all hours (by date) --> book by seat id, hour
@@ -34,6 +33,7 @@ async def book_seats(update: Update, context: CallbackContext) -> int:
     if not check_if_logged_on_as_company(update, context):
         await update.message.reply_text("You are not logged in as a company.")
         return ConversationHandler.END
+    
     
     """Books seats for the company."""
     data = load_data()

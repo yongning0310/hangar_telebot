@@ -1,7 +1,6 @@
 from telegram.ext import Application, CommandHandler, CallbackContext, ConversationHandler, MessageHandler, filters
 from data.data import load_data, save_data
 from telegram import Update, KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove
-from general_command import cancel
 
 date_format_example = "YYYY-MM-DD"
 
@@ -127,6 +126,10 @@ async def add_company_to_database(company_id, company_name, company_password, co
     }
     save_data(data)
 
+async def cancel_add_company(update: Update, context: CallbackContext) -> int:
+    await update.message.reply_text('Add Company canceled.', reply_markup=ReplyKeyboardRemove())
+    return ConversationHandler.END
+
 add_company_handler = ConversationHandler(
     entry_points=[CommandHandler('add_company', add_company)],
     states={
@@ -134,7 +137,7 @@ add_company_handler = ConversationHandler(
         COMPANY_PASSWORD: [MessageHandler(filters.TEXT & ~filters.COMMAND, company_password)],
         COMPANY_QUOTA: [MessageHandler(filters.TEXT & ~filters.COMMAND, company_quota)]
     },
-    fallbacks=[CommandHandler('cancel', cancel)],
+    fallbacks=[CommandHandler('cancel', cancel_add_company)],
 )
 
 # 5. Delete company (by company id)
@@ -226,6 +229,11 @@ async def edit_quota(update: Update, context: CallbackContext) -> int:
     await update.message.reply_text("Company quota edited successfully! Do you want to continue editing? (yes/no)")
     return EDIT_FIELD
 
+async def cancel_edit_company(update: Update, context: CallbackContext) -> int:
+    await update.message.reply_text('Edit Company canceled.', reply_markup=ReplyKeyboardRemove())
+    return ConversationHandler.END
+
+
 # Define the conversation handler
 edit_company_handler = ConversationHandler(
     entry_points=[CommandHandler('edit_company', edit_company)],
@@ -236,8 +244,10 @@ edit_company_handler = ConversationHandler(
         EDIT_PASSWORD: [MessageHandler(filters.TEXT & ~filters.COMMAND, edit_password)],
         EDIT_QUOTA: [MessageHandler(filters.TEXT & ~filters.COMMAND, edit_quota)]
     },
-    fallbacks=[CommandHandler('cancel', cancel)],  # You would need to define a 'cancel' function
+    fallbacks=[CommandHandler('cancel', cancel_edit_company)],  # You would need to define a 'cancel' function
 )
+
+
 
 #view companies (total quota, current quota used, company name, company password)
 async def view_all_companies(update: Update, context: CallbackContext) -> None:

@@ -5,7 +5,7 @@ from company.command import book_seats, check_quota, view_existing_bookings
 from telegram import Update, KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove, WebAppInfo
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters, CallbackContext, ConversationHandler
 from data.data import load_data, save_data
-from general_command import ADMIN_PASSWORD, COMPANY_NAME, COMPANY_PASSWORD, admin_password_check, company_name_check, company_password_check, start, admin_login, company_login, cancel
+from general_command import ADMIN_PASSWORD, COMPANY_NAME, COMPANY_PASSWORD, admin_password_check, company_name_check, company_password_check, start, admin_login, company_login, logout
 from admin.command import add_seat, mark_seat_as_broken, view_avail_seats, edit_company_handler
 from general_command import start, admin_login, company_login
 # from message_handler import handle_message
@@ -40,7 +40,7 @@ def main():
 
     # Command handlers
     application.add_handler(CommandHandler("start", start))
-    application.add_handler(CommandHandler("cancel", cancel))
+    application.add_handler(CommandHandler("logout", logout))
     application.add_handler(admin_conversation_handler)
     application.add_handler(company_conversation_handler)
     data = load_data()

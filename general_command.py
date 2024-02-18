@@ -79,6 +79,6 @@ async def company_password_check(update: Update, context: CallbackContext) -> in
         return COMPANY_PASSWORD
 
 
-async def cancel(update: Update, context: CallbackContext) -> None:
+async def logout(update: Update, context: CallbackContext) -> None:
     context.user_data.clear()  # Clear user-specific data
     await update.message.reply_text("You have been logged out.")
