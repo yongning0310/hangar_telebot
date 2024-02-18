@@ -7,8 +7,8 @@ from data.data import load_data, save_data
 from general_command import ADMIN_PASSWORD, COMPANY_NAME, COMPANY_PASSWORD, admin_password_check, company_name_check, company_password_check, start, admin_login, company_login, cancel
 from admin.command import add_seat, mark_seat_as_broken, view_avail_seats, edit_company_handler
 from general_command import start, admin_login, company_login
-from message_handler import handle_message
-from admin.command import add_seat, mark_seat_as_broken, view_avail_seats, add_company_handler, delete_company, edit_company_handler, view_all_companies, view_company
+# from message_handler import handle_message
+from admin.command import add_seat, mark_seat_as_broken, view_avail_seats, add_company_handler, delete_company, edit_company_handler, view_all_companies, view_company, view_all_seats
 from config import TOKEN
 
 
@@ -53,6 +53,7 @@ def main():
     application.add_handler(edit_company_handler)
     application.add_handler(CommandHandler('view_all_companies', view_all_companies))
     application.add_handler(CommandHandler('view_company', view_company))
+    application.add_handler(CommandHandler('view_all_seats', view_all_seats))
     # application.add_handler(CommandHandler("book_seat", book_seat))
 
     application.run_polling()

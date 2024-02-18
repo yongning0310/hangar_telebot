@@ -173,8 +173,6 @@ async def company_id(update: Update, context: CallbackContext) -> int:
     if company_id < 1 or company_id > num_companies or company_id not in data["companies"]:
         await update.message.reply_text(f"Company {company_id} does not exist.")
         return ConversationHandler.END
-    # Store the data in context.user_data
-    context.user_data['company_data'] = data
 
     await update.message.reply_text("Enter 'name' to edit name, 'password' to edit password, 'quota' to edit quota:")
     return EDIT_FIELD
@@ -204,19 +202,27 @@ async def edit_field(update: Update, context: CallbackContext) -> int:
 async def edit_name(update: Update, context: CallbackContext) -> int:
     """Edits the company name."""
     # Here you would typically edit the company name in your database
+    data =  load_data()
     company_id = context.user_data['company_id']
+    data["companies"][company_id]['name'] = update.message.text
 
     await update.message.reply_text("Company name edited successfully! Do you want to continue editing? (yes/no)")
     return EDIT_FIELD
 
 async def edit_password(update: Update, context: CallbackContext) -> int:
     """Edits the company password."""
-    # Here you would typically edit the company password in your database
+    data =  load_data()
+    company_id = context.user_data['company_id']
+    data["companies"][company_id]['password'] = update.message.text
+
     await update.message.reply_text("Company password edited successfully! Do you want to continue editing? (yes/no)")
     return EDIT_FIELD
 
 async def edit_quota(update: Update, context: CallbackContext) -> int:
     """Edits the company quota."""
+    data =  load_data()
+    company_id = context.user_data['company_id']
+    data["quotas"][company_id]['total_quota'] = int(update.message.text)
     # Here you would typically edit the company quota in your database
     await update.message.reply_text("Company quota edited successfully! Do you want to continue editing? (yes/no)")
     return EDIT_FIELD
@@ -238,8 +244,18 @@ edit_company_handler = ConversationHandler(
 async def view_all_companies(update: Update, context: CallbackContext) -> None:
     """Displays information about all companies."""
     data = load_data()
-    for company in data["companies"]:
-        await update.message.reply_text(f"Name: {company['name']}, Password: {company['password']}, Quota: {company['quota']}")
+    await update.message.reply_text("All companies:")
+    for company_id in data["companies"]:
+        company = data["companies"][company_id]
+        company_quota = data["quotas"][company_id]
+        await update.message.reply_text(f"Name: {company['name']}, Password: {company['password']}, Total quota: {company_quota['total_quota']}, Quota used: {company_quota['quota_used']}")
+
+async def view_all_seats(update: Update, context: CallbackContext) -> None:
+    """Displays information about all seats."""
+    data = load_data()
+    for seat_id in data["seats"]:
+        seat = data["seats"][seat_id]
+        await update.message.reply_text(f"Seat ID: {seat_id}, Is broken: {seat['is_broken']}")
 
 #view info of a particular company
 async def view_company(update: Update, context: CallbackContext) -> None:

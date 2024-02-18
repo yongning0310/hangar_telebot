@@ -17,12 +17,11 @@
     },
     "dates": {
         "2024-02-20": {
-            "09:00": [
-                {
-                    "seat_id": "seat1",
+            "09:00": {
+                "1": {
                     "is_booked": false
                 }
-            ]
+            }
         }
     },
     "seats": {
@@ -34,14 +33,20 @@
         },
         "3": {
             "is_broken": false
+        },
+        "4": {
+            "is_broken": true
+        },
+        "5": {
+            "is_broken": false
         }
     },
     "quotas": {
-        "company1": {
+        "1": {
             "total_quota": 100,
             "quota_used": 95
         },
-        "company2": {
+        "2": {
             "total_quota": 50,
             "quota_used": 50
         }
