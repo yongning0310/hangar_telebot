@@ -168,11 +168,12 @@ async def company_id(update: Update, context: CallbackContext) -> int:
 
     # Load data
     data = load_data()
-    num_companies = len(data["companies"])
-    if company_id < 1 or company_id > num_companies or company_id not in data["companies"]:
+
+    if company_id not in data["companies"]:
         await update.message.reply_text(f"Company {company_id} does not exist.")
         return ConversationHandler.END
 
+    context.user_data['company_id'] = company_id
     await update.message.reply_text("Enter 'name' to edit name, 'password' to edit password, 'quota' to edit quota:")
     return EDIT_FIELD
 
@@ -204,6 +205,7 @@ async def edit_name(update: Update, context: CallbackContext) -> int:
     data =  load_data()
     company_id = context.user_data['company_id']
     data["companies"][company_id]['name'] = update.message.text
+    save_data(data)
 
     await update.message.reply_text("Company name edited successfully! Do you want to continue editing? (yes/no)")
     return EDIT_FIELD
@@ -213,6 +215,7 @@ async def edit_password(update: Update, context: CallbackContext) -> int:
     data =  load_data()
     company_id = context.user_data['company_id']
     data["companies"][company_id]['password'] = update.message.text
+    save_data(data)
 
     await update.message.reply_text("Company password edited successfully! Do you want to continue editing? (yes/no)")
     return EDIT_FIELD
@@ -222,6 +225,7 @@ async def edit_quota(update: Update, context: CallbackContext) -> int:
     data =  load_data()
     company_id = context.user_data['company_id']
     data["quotas"][company_id]['total_quota'] = int(update.message.text)
+    save_data(data)
     # Here you would typically edit the company quota in your database
     await update.message.reply_text("Company quota edited successfully! Do you want to continue editing? (yes/no)")
     return EDIT_FIELD
