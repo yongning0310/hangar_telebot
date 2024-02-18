@@ -1,70 +1,72 @@
 {
-    "admin": [
-        {
-            "id": "admin1",
-            "password": "hangar_admin"
-        }
-    ],
-    "companies": {
-        "1": {
-            "name": "Company A",
-            "password": "company1"
-        },
-        "2": {
-            "name": "Company B",
-            "password": "company2"
-        }
-    },
-    "dates": {
-        "2024-02-20": {
-            "09:00": {
-                "1": {
-                    "is_booked": false
-                }
-            }
-        }
-    },
-    "seats": {
-        "1": {
-            "is_broken": false
-        },
-        "2": {
-            "is_broken": true
-        },
-        "3": {
-            "is_broken": false
-        },
-        "4": {
-            "is_broken": true
-        },
-        "5": {
-            "is_broken": false
-        }
-    },
-    "quotas": {
-        "1": {
-            "total_quota": 100,
-            "quota_used": 95
-        },
-        "2": {
-            "total_quota": 50,
-            "quota_used": 50
-        }
-    },
-    "bookings": {
-        "1": [
-            {
-                "date": "2024-02-20",
-                "hour": "09:00",
-                "seat_id": "seat1"
-            }
-        ],
-        "2": [
-            {
-                "date": "2024-02-20",
-                "hour": "09:00",
-                "seat_id": "seat2"
-            }
-        ]
+  "admin": [
+    {
+      "id": "admin1",
+      "password": "hangar_admin"
     }
+  ],
+  "companies": {
+    "1": {
+      "id": "1",
+      "name": "Company A",
+      "password": "company1"
+    },
+    "2": {
+      "id": "2",
+      "name": "Company B",
+      "password": "company2"
+    }
+  },
+  "dates": {
+    "2024-02-20": {
+      "09:00": {
+        "1": {
+          "is_booked": false
+        }
+      }
+    }
+  },
+  "seats": {
+    "1": {
+      "is_broken": false
+    },
+    "2": {
+      "is_broken": true
+    },
+    "3": {
+      "is_broken": false
+    },
+    "4": {
+      "is_broken": true
+    },
+    "5": {
+      "is_broken": false
+    }
+  },
+  "quotas": {
+    "1": {
+      "total_quota": 100,
+      "quota_used": 95
+    },
+    "2": {
+      "total_quota": 50,
+      "quota_used": 50
+    }
+  },
+  "bookings": {
+    "1": [
+      {
+        "date": "2024-02-20",
+        "hour": "09:00",
+        "seat_id": "seat1"
+      }
+    ],
+    "2": [
+      {
+        "date": "2024-02-20",
+        "hour": "09:00",
+        "seat_id": "seat2"
+      }
+    ]
+  }
 }
