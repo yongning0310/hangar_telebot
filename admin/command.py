@@ -406,11 +406,19 @@ async def view_all_seats(update: Update, context: CallbackContext) -> None:
     
     """Displays information about all seats."""
     data = load_data()
-    message = ""
+    broken_seats = []
+    working_seats = []
     for seat_id in data["seats"]:
         seat = data["seats"][seat_id]
-        message += f"Seat ID: {seat_id}, Is broken: {seat['is_broken']}\n"
-    await update.message.reply_text(message)
+        if seat['is_broken']:
+            broken_seats.append(seat_id)
+        else:
+            working_seats.append(seat_id)
+
+    working_seats_message = "Working seats: " + ', '.join(map(str, working_seats))
+    broken_seats_message = "Broken seats: " + ', '.join(map(str, broken_seats))
+
+    await update.message.reply_text(working_seats_message + "\n" + broken_seats_message)
 
 #8. View a specific company (by company id)
 @handle_errors
