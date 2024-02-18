@@ -66,6 +66,7 @@ async def seat_physical_status(update: Update, context: CallbackContext) -> int:
     
     if seat_status == "broken":
         data["seats"][seat_id]["is_broken"] = True
+        cancel_booking_by_seat_id(data, seat_id)
     elif seat_status == "available":
         data["seats"][seat_id]["is_broken"] = False
     else:
@@ -75,6 +76,14 @@ async def seat_physical_status(update: Update, context: CallbackContext) -> int:
 
     await update.message.reply_text(f"Seat {seat_id} marked as {seat_status}.")
     return ConversationHandler.END
+
+async def cancel_booking_by_seat_id(data, seat_id):
+    for company_id in data["bookings"]:
+        for booking in data["bookings"][company_id]:
+            if booking["seat_id"] == seat_id:
+                booking["seat_id"] = None
+                booking["status"] = "cancelled"
+    save_data(data)
 
 mark_seat_handler = ConversationHandler(
     entry_points=[CommandHandler('mark_seat_status', mark_seat_status)],
@@ -364,8 +373,8 @@ edit_company_handler = ConversationHandler(
 )
 
 
-
-#view companies (total quota, current quota used, company name, company password)
+#7. View all companies (total quota, current quota used, company name, company password)
+#might make password not visible since privacy concern
 async def view_all_companies(update: Update, context: CallbackContext) -> None:
     if not check_if_logged_on_as_admin(update, context):
         await update.message.reply_text("You are not logged in as an admin.")
@@ -390,7 +399,7 @@ async def view_all_seats(update: Update, context: CallbackContext) -> None:
         seat = data["seats"][seat_id]
         await update.message.reply_text(f"Seat ID: {seat_id}, Is broken: {seat['is_broken']}")
 
-#view info of a particular company
+#8. View a specific company (by company id)
 async def view_company(update: Update, context: CallbackContext) -> None:
     if not check_if_logged_on_as_admin(update, context):
         await update.message.reply_text("You are not logged in as an admin.")

@@ -55,33 +55,31 @@ async def company_login(update: Update, context: CallbackContext) -> int:
 
 async def company_name_check(update: Update, context: CallbackContext) -> int:
     """Checks the company name and prompts for password."""
-    text = update.message.text
-    # Split the text into company name and password, should be in the form on {company_name}/{password}
-    # company_name, password = text.lower().split('/')
+    input_company_name = update.message.text
+    # Check if the company name is in the list of companies (case-insensitive)
 
-    # data[companies] is a list of companies in the form of {
-    #   "id": "company2",
-    #   "name": "Company2",
-    #   "password": "company2"
-    # }
-    # i want to check if the company name is in the list of companies, regardless of upper or lower case
-    print(data["companies"])
-    if text.lower() in [company["name"].lower() for company in data["companies"]]:
-        # context.user_data["company"] should store the corresponding company object
-        context.user_data["company"] = [company for company in data["companies"] if company["name"].lower() == text.lower()][0]
+    # print(data["companies"])
+    if is_valid_company_name(input_company_name):
+        #should only have one company that is a match, thus use "next"
+        company_list = [data["companies"][company_id] for company_id in data["companies"]]
+        context.user_data["company"] = next(company for company in company_list if company["name"].lower() == input_company_name.lower())
+
         await update.message.reply_text("Please enter your company password:")
         return COMPANY_PASSWORD
     else:
         await update.message.reply_text("Company name not recognized. Please try again.")
         return COMPANY_NAME
+    
+async def is_valid_company_name(company_name: str) -> bool:
+    data = load_data()
+    return company_name.lower() in [data["companies"][company_id]["name"].lower() for company_id in data["companies"]]
 
 async def company_password_check(update: Update, context: CallbackContext) -> int:
     """Checks the company password."""
-    company = context.user_data.get("company")
-    text = update.message.text
-    # data[companies] is a list of companies in the form of [{'id': 'company1', 'name': 'Company1', 'password': 'company1'}, {'id': 'company2', 'name': 'Company2', 'password': 'company2'}]
+    company = context.user_data["company"]
+    input_password = update.message.text
 
-    if text == company["password"]:
+    if input_password == company["password"]:
         company_name = company["name"]
         await update.message.reply_text(f"Authenticated as {company_name}")
         context.user_data['role'] = 'company'
@@ -89,7 +87,6 @@ async def company_password_check(update: Update, context: CallbackContext) -> in
     else:
         await update.message.reply_text("Incorrect password. Please try again.")
         return COMPANY_PASSWORD
-
 
 async def logout(update: Update, context: CallbackContext) -> None:
     context.user_data.clear()  # Clear user-specific data

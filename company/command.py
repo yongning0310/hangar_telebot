@@ -5,6 +5,7 @@ from telegram import Update, KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardR
 #view quota (total and used)
 #view avail seats for all hours (by date) --> book by seat id, hour
 #view all bookings (by date)
+date_format_example = "YYYY-MM-DD"
 
 # put this before every function call below, should raise error if not admin
 def check_if_logged_on_as_company(update: Update, context: CallbackContext) -> bool:
