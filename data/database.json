@@ -1,0 +1,23 @@
+{
+    "total_seats": 30,
+    "seats_booked": 0,
+    "admin_password": "hangar_admin",
+    "companies": {
+      "company1": {
+        "password": "company1",
+        "quota": 20,
+        "seats_booked": []
+      },
+      "company2": {
+        "password": "company2",
+        "quota": 20,
+        "seats_booked": []
+      },
+      "company3": {
+        "password": "company3",
+        "quota": 20,
+        "seats_booked": []
+      }
+    }
+  }
+  
