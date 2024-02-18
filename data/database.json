@@ -5,18 +5,16 @@
             "password": "hangar_admin"
         }
     ],
-    "companies": [
-        {
-            "id": "company1",
+    "companies": {
+        "1": {
             "name": "Company A",
             "password": "company1"
         },
-        {
-            "id": "company2",
+        "2": {
             "name": "Company B",
             "password": "company2"
         }
-    ],
+    },
     "dates": {
         "2024-02-20": {
             "09:00": [
@@ -52,14 +50,14 @@
         }
     },
     "bookings": {
-        "company1": [
+        "1": [
             {
                 "date": "2024-02-20",
                 "hour": "09:00",
                 "seat_id": "seat1"
             }
         ],
-        "company2": [
+        "2": [
             {
                 "date": "2024-02-20",
                 "hour": "09:00",
