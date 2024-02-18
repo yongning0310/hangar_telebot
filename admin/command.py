@@ -2,6 +2,7 @@ from telegram.ext import Application, CommandHandler, CallbackContext, Conversat
 from data.data import load_data, save_data
 from telegram import Update, KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove
 from datetime import datetime, timedelta
+from error_handler import handle_errors
 
 date_format_example = "YYYY-MM-DD"
 
@@ -19,6 +20,7 @@ async def cancel_add_company(update: Update, context: CallbackContext) -> int:
 # 1. Add seats (automatically adds one more seat)
 # how to i call check_if_logged_on_as_admin before add_seat?
 # i will put this before every function call below, should raise error if not admin
+@handle_errors
 async def add_seat(update: Update, context: CallbackContext) -> int:
     if not check_if_logged_on_as_admin(update, context):
         await update.message.reply_text("You are not logged in as an admin.")
@@ -36,7 +38,7 @@ async def add_seat(update: Update, context: CallbackContext) -> int:
 
 # 2. Mark seats as broken (by seat_id)
 SEAT_ID, SEAT_STATUS = range(2)
-
+@handle_errors
 async def mark_seat_status(update:Update, context: CallbackContext) -> int:
     # Starts conversation to mark seat as broken
     if not check_if_logged_on_as_admin(update, context):
@@ -92,7 +94,9 @@ mark_seat_handler = ConversationHandler(
     fallbacks=[CommandHandler('cancel', cancel_add_company)],
 )
 # 3. View seats avail (by date)
+
 DATE = range(1)
+@handle_errors
 async def view_avail_seats(update: Update, context: CallbackContext) -> int:
     if not check_if_logged_on_as_admin(update, context):
         await update.message.reply_text("You are not logged in as an admin.")
@@ -101,32 +105,34 @@ async def view_avail_seats(update: Update, context: CallbackContext) -> int:
     await update.message.reply_text("Please provide date in the format: " + date_format_example)
     return DATE
 
-async def date(update: Update, context: CallbackContext) -> int:
-    date_str = update.message.text
-    data = load_data()
-
-    # Convert string to datetime object assuming the date format is "YYYY-MM-DD"
+def is_valid_date_format(date_str: str) -> bool:
     try:
         input_date = datetime.strptime(date_str, "%Y-%m-%d")
     except ValueError:
-        await update.message.reply_text("Invalid date format. Please use YYYY-MM-DD.")
-        return DATE  # Assuming DATE is a state you've defined for handling date input
+        return False
 
+def is_valid_date_range(date_str: str, data) -> bool:
     today = datetime.now().date()
     max_date = today + timedelta(days=7)
+    input_date = datetime.strptime(date_str, "%Y-%m-%d").date()
+    return today <= input_date <= max_date and date_str in data["dates "]
+
+async def date(update: Update, context: CallbackContext) -> int:
+    date_str = update.message.text
+    data = load_data()
+    # Convert string to datetime object assuming the date format is "YYYY-MM-DD"
+    if not is_valid_date_format(date_str):
+        await update.message.reply_text("Invalid date format. Please use YYYY-MM-DD.")
+        return DATE  
 
     # Check if the date is today or within the next 7 days
-    if not (today <= input_date.date() <= max_date):
+    if not is_valid_date_range(date_str, data):
         await update.message.reply_text(f"Date {date_str} is not within 7 days from today. Please enter a valid date.")
         return DATE
 
-    if date_str not in data["dates"]:
-        await update.message.reply_text(f"Date {date_str} does not exist. Enter a date that is within 7 days from today")
-        return DATE
-
+    await update.message.reply_text(f"Available seats for {date_str}.")
     all_hours = data["dates"][date_str]
     seats_data = data["seats"]
-    await update.message.reply_text(f"Available seats for {date_str}.")
 
     for hour, seats_dict in all_hours.items():
         available_seats = [
@@ -154,7 +160,7 @@ view_avail_seats_handler = ConversationHandler(
 # 4. Add company (name, password, quota) (prevent duplicate names)
 # Define states
 COMPANY_NAME, COMPANY_PASSWORD, COMPANY_QUOTA = range(3)
-
+@handle_errors
 async def add_company(update: Update, context: CallbackContext) -> int:
     if not check_if_logged_on_as_admin(update, context):
         await update.message.reply_text("You are not logged in as an admin.")
@@ -225,6 +231,7 @@ add_company_handler = ConversationHandler(
 
 # 5. Delete company (by company id)
 DEL_COMPANY_ID = range(1)
+@handle_errors
 async def delete_company(update: Update, context: CallbackContext) -> None:
     if not check_if_logged_on_as_admin(update, context):
         await update.message.reply_text("You are not logged in as an admin.")
@@ -277,6 +284,7 @@ delete_company_handler = ConversationHandler(
 # 6. Edit company (by company id, edit quota/password)
 # Define states
 COMPANY_ID, EDIT_FIELD, EDIT_NAME, EDIT_PASSWORD, EDIT_QUOTA = range(5)
+@handle_errors
 async def edit_company(update: Update, context: CallbackContext) -> int:
     if not check_if_logged_on_as_admin(update, context):
         await update.message.reply_text("You are not logged in as an admin.")
@@ -375,6 +383,7 @@ edit_company_handler = ConversationHandler(
 
 #7. View all companies (total quota, current quota used, company name, company password)
 #might make password not visible since privacy concern
+@handle_errors
 async def view_all_companies(update: Update, context: CallbackContext) -> None:
     if not check_if_logged_on_as_admin(update, context):
         await update.message.reply_text("You are not logged in as an admin.")
@@ -383,10 +392,12 @@ async def view_all_companies(update: Update, context: CallbackContext) -> None:
     """Displays information about all companies."""
     data = load_data()
     await update.message.reply_text("All companies:")
+    message = ""
     for company_id in data["companies"]:
         company = data["companies"][company_id]
         company_quota = data["quotas"][company_id]
-        await update.message.reply_text(f"ID:{company['id']}, Name: {company['name']}, Password: {company['password']}, Total quota: {company_quota['total_quota']}, Quota used: {company_quota['quota_used']}")
+        message += f"ID:{company['id']}, Name: {company['name']}, Password: {company['password']}, Total quota: {company_quota['total_quota']}, Quota used: {company_quota['quota_used']}\n"
+    await update.message.reply_text(message)
 
 async def view_all_seats(update: Update, context: CallbackContext) -> None:
     if not check_if_logged_on_as_admin(update, context):
@@ -395,11 +406,14 @@ async def view_all_seats(update: Update, context: CallbackContext) -> None:
     
     """Displays information about all seats."""
     data = load_data()
+    message = ""
     for seat_id in data["seats"]:
         seat = data["seats"][seat_id]
-        await update.message.reply_text(f"Seat ID: {seat_id}, Is broken: {seat['is_broken']}")
+        message += f"Seat ID: {seat_id}, Is broken: {seat['is_broken']}\n"
+    await update.message.reply_text(message)
 
 #8. View a specific company (by company id)
+@handle_errors
 async def view_company(update: Update, context: CallbackContext) -> None:
     if not check_if_logged_on_as_admin(update, context):
         await update.message.reply_text("You are not logged in as an admin.")

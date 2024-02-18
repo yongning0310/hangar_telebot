@@ -1,7 +1,7 @@
 from telegram.ext import Application, CommandHandler, CallbackContext, ConversationHandler, MessageHandler, filters
 from data.data import load_data, save_data
 from telegram import Update, KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove
-
+from error_handler import handle_errors
 #view quota (total and used)
 #view avail seats for all hours (by date) --> book by seat id, hour
 #view all bookings (by date)
@@ -15,6 +15,7 @@ def check_if_logged_on_as_company(update: Update, context: CallbackContext) -> b
         return False
     
 # 1. Check quota
+@handle_errors
 async def check_quota(update: Update, context: CallbackContext) -> int:
     if not check_if_logged_on_as_company(update, context):
         await update.message.reply_text("You are not logged in as a company.")
@@ -30,6 +31,7 @@ async def check_quota(update: Update, context: CallbackContext) -> int:
     return ConversationHandler.END
 
 # 2. Book seats
+@handle_errors
 async def book_seats(update: Update, context: CallbackContext) -> int:
     if not check_if_logged_on_as_company(update, context):
         await update.message.reply_text("You are not logged in as a company.")
@@ -51,6 +53,7 @@ async def book_seats(update: Update, context: CallbackContext) -> int:
     return ConversationHandler.END
 
 # 3. View existing bookings
+@handle_errors
 async def view_my_bookings(update: Update, context: CallbackContext) -> int:
     if not check_if_logged_on_as_company(update, context):
         await update.message.reply_text("You are not logged in as a company.")

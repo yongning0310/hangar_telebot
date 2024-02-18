@@ -36,6 +36,8 @@ company_conversation_handler = ConversationHandler(
     fallbacks=[]
 )
 
+
+
 def add_new_dates():
     # Adds new dates for the next 7 days to the database, initializing the seats for each date and hour
     data = load_data()
@@ -61,7 +63,6 @@ def add_new_dates():
     for date in dates_to_delete:
         del dates[date]
     
-
 def main():
     application = Application.builder().token(TOKEN).build()
 

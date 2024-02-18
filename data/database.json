@@ -1640,6 +1640,9 @@
         },
         "6": {
             "is_broken": false
+        },
+        "7": {
+            "is_broken": false
         }
     },
     "quotas": {
@@ -1657,7 +1660,8 @@
             {
                 "date": "2024-02-20",
                 "hour": "09:00",
-                "seat_id": "seat1"
+                "seat_id": "1",
+                "status": "confirmed"
             }
         ]
     }
