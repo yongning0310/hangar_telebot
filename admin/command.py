@@ -5,8 +5,22 @@ from general_command import cancel
 
 date_format_example = "YYYY-MM-DD"
 
+# i will put this before every function call below, should raise error if not admin
+def check_if_logged_on_as_admin(update: Update, context: CallbackContext) -> bool:
+    if context.user_data.get('role') == 'admin':
+        return True
+    else:
+        return False
+
+
 # 1. Add seats (automatically adds one more seat)
+# how to i call check_if_logged_on_as_admin before add_seat?
+# i will put this before every function call below, should raise error if not admin
 async def add_seat(update: Update, context: CallbackContext) -> int:
+    if not check_if_logged_on_as_admin(update, context):
+        await update.message.reply_text("You are not logged in as an admin.")
+        return ConversationHandler.END
+
     """Adds a seat to the database."""
     data = load_data()
     data["seats"].append({
