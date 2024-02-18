@@ -2,6 +2,7 @@
 
 import json
 import logging
+from company.command import book_seats, check_quota, view_existing_bookings
 from telegram import Update, KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove, WebAppInfo
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters, CallbackContext, ConversationHandler
 from data.data import load_data, save_data
@@ -48,6 +49,10 @@ def main():
     application.add_handler(CommandHandler("view_avail_seats", view_avail_seats))
     application.add_handler(edit_company_handler)
     # application.add_handler(CommandHandler("book_seat", book_seat))
+        # # Placeholder handlers for admin and company commands
+    application.add_handler(CommandHandler("check_quota", check_quota))
+    application.add_handler(CommandHandler("book_seats", book_seats))
+    application.add_handler(CommandHandler("view_existing_bookings", view_existing_bookings))
 
     application.run_polling()
 

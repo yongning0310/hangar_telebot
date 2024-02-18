@@ -1,70 +1,87 @@
 {
   "admin": [
-      {
-          "id": "admin1",
-          "password": "hangar_admin"
-      }
+    {
+      "id": "admin1",
+      "password": "hangar_admin"
+    }
   ],
   "companies": [
-      {
-          "id": "company1",
-          "name": "Company1",
-          "password": "company1"
-      },
-      {
-          "id": "company2",
-          "name": "Company2",
-          "password": "company2"
-      }
+    {
+      "id": "company1",
+      "name": "Company1",
+      "password": "company1"
+    },
+    {
+      "id": "company2",
+      "name": "Company2",
+      "password": "company2"
+    }
   ],
   "dates": {
-      "2024-02-20": {
-          "09:00": [
-              {
-                  "seat_id": "seat1",
-                  "is_booked": false
-              }
-          ]
-      }
+    "2024-02-20": {
+      "09:00": [
+        {
+          "seat_id": "seat1",
+          "is_booked": false
+        }
+      ]
+    }
   },
   "seats": [
-      {
-          "id": 1,
-          "is_broken": false
-      },
-      {
-          "id": 2,
-          "is_broken": true
-      },
-      {
-          "id": 3,
-          "is_broken": false
-      }
+    {
+      "id": 1,
+      "is_broken": false
+    },
+    {
+      "id": 2,
+      "is_broken": true
+    },
+    {
+      "id": 3,
+      "is_broken": false
+    },
+    {
+      "id": 4,
+      "is_broken": false
+    }
   ],
   "quotas": {
-      "company1": {
-          "total_quota": 100,
-          "quota_used": 95
-      },
-      "company2": {
-          "total_quota": 50,
-          "quota_used": 50
-      }
+    "company1": {
+      "total_quota": 100,
+      "quota_used": 95
+    },
+    "company2": {
+      "total_quota": 50,
+      "quota_used": 50
+    }
   },
   "bookings": {
-      "company1": [
-          {
-              "date": "2024-02-20",
-              "hour": "09:00",
-              "seat_id": "seat1"
-          }
-      ],
-      "company2": [
-          {
-              "date": "2024-02-20",
-              "hour": "09:00",
-              "seat_id": "seat2"
-          }
-      ]
+    "company1": [
+      {
+        "day": "Monday",
+        "date": "2024-02-20",
+        "hour": "09:00",
+        "seat_id": "seat1"
+      },
+      {
+        "day": "Tuesday",
+        "date": "2024-02-20",
+        "hour": "09:00",
+        "seat_id": "seat2"
+      },
+      {
+        "day": "Wednesday",
+        "date": "2024-02-20",
+        "hour": "09:00",
+        "seat_id": "seat3"
+      }
+    ],
+    "company2": [
+      {
+        "date": "2024-02-20",
+        "hour": "09:00",
+        "seat_id": "seat2"
+      }
+    ]
   }
 }

@@ -5,13 +5,12 @@ from general_command import cancel
 
 date_format_example = "YYYY-MM-DD"
 
-# i will put this before every function call below, should raise error if not admin
+# put this before every function call below, should raise error if not admin
 def check_if_logged_on_as_admin(update: Update, context: CallbackContext) -> bool:
     if context.user_data.get('role') == 'admin':
         return True
     else:
         return False
-
 
 # 1. Add seats (automatically adds one more seat)
 # how to i call check_if_logged_on_as_admin before add_seat?
