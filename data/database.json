@@ -1,23 +1,65 @@
 {
-    "total_seats": 30,
-    "seats_booked": 0,
-    "admin_password": "hangar_admin",
-    "companies": {
-      "company1": {
-        "password": "company1",
-        "quota": 20,
-        "seats_booked": []
-      },
-      "company2": {
-        "password": "company2",
-        "quota": 20,
-        "seats_booked": []
-      },
-      "company3": {
-        "password": "company3",
-        "quota": 20,
-        "seats_booked": []
-      }
+  "admin": [
+    {
+      "id": "admin1",
+      "password": "hangar_admin"
     }
+  ],
+  "companies": [
+    {
+      "id": "company1",
+      "name": "Company A",
+      "password": "company1"
+    },
+    {
+      "id": "company2",
+      "name": "Company B",
+      "password": "company2"
+    }
+  ],
+  "dates": { 
+    "2024-02-20": {
+      "09:00": [
+        {
+          "seat_id": "seat1",
+          "is_booked": false 
+        }
+      ]
+    }
+  },
+  "seats": [
+    {
+      "seat_id": "seat1",
+      "physical_status": "available"
+    }
+  ],
+  "quotas": [
+    {
+      "company_id": "company1",
+      "total_quota": 100,
+      "quota_used": 95
+    },
+    {
+      "company_id": "company2",
+      "total_quota": 50,
+      "quota_used": 50
+    }
+  ],
+
+  "bookings": {
+    "company1": [
+      {
+        "date": "2024-02-20",
+        "hour": "09:00",
+        "seat_id": "seat1"
+      }
+    ],
+    "company2": [
+      {
+        "date": "2024-02-20",
+        "hour": "09:00",
+        "seat_id": "seat2"
+      }
+    ]
   }
-  
+}
