@@ -8,12 +8,12 @@
   "companies": [
     {
       "id": "company1",
-      "name": "Company A",
+      "name": "Company1",
       "password": "company1"
     },
     {
       "id": "company2",
-      "name": "Company B",
+      "name": "Company2",
       "password": "company2"
     }
   ],
