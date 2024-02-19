@@ -191,7 +191,8 @@ async def company_name(update: Update, context: CallbackContext) -> int:
     """Stores the company name and asks for the password."""
     company_name = update.message.text
     data = context.user_data["data"]
-    if company_name in data["companies"]:
+
+    if any(company["name"].lower() == company_name.lower() for company in data["companies"].values()):
         await update.message.reply_text("Company name already exists. Please enter a different name.")
         return COMPANY_NAME
     context.user_data['company_name'] = update.message.text
