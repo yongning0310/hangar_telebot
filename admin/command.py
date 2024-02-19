@@ -21,22 +21,12 @@ async def cancel_add_company(update: Update, context: CallbackContext) -> int:
 # 1. Add seats (automatically adds one more seat)
 # how to i call check_if_logged_on_as_admin before add_seat?
 # i will put this before every function call below, should raise error if not admin
-@handle_errors
+# @handle_errors
 async def add_seat(update: Update, context: CallbackContext) -> int:
     if not check_if_logged_on_as_admin(update, context):
         await update.message.reply_text("You are not logged in as an admin.")
         return ConversationHandler.END
 
-    # """Adds a seat to the database."""
-    # data = load_data()
-    # seat_id = str(len(data["seats"]) + 1)
-    # data["seats"][seat_id] = {
-    #     "is_broken": False
-    # }
-    # save_data(data)
-    # await update.message.reply_text(f"Seat {len(data['seats'])} added successfully.")
-    # return ConversationHandler.END
-    # Add the new seat to 'seats' with 'is_broken': False
     data = load_data()
     seat_id = str(len(data["seats"]) + 1)
     data["seats"][seat_id] = {"is_broken": False}
@@ -55,7 +45,7 @@ async def add_seat(update: Update, context: CallbackContext) -> int:
 
 # 2. Mark seats as broken (by seat_id)
 SEAT_ID, SEAT_STATUS = range(2)
-@handle_errors
+# @handle_errors
 async def mark_seat_status(update:Update, context: CallbackContext) -> int:
     # Starts conversation to mark seat as broken
     if not check_if_logged_on_as_admin(update, context):
@@ -96,6 +86,7 @@ async def seat_physical_status(update: Update, context: CallbackContext) -> int:
     await update.message.reply_text(f"Seat {seat_id} marked as {seat_status}.")
     return ConversationHandler.END
 
+# @handle_errors
 async def cancel_booking_by_seat_id(data, seat_id):
     for company_id in data["bookings"]:
         for booking in data["bookings"][company_id]:
@@ -113,7 +104,7 @@ mark_seat_handler = ConversationHandler(
 # 3. View seats avail (by date)
 
 DATE = range(1)
-@handle_errors
+# @handle_errors
 async def view_avail_seats(update: Update, context: CallbackContext) -> int:
     if not (check_if_logged_on_as_admin(update, context) or check_if_logged_on_as_company(update, context)):
         await update.message.reply_text("You are not logged in as an admin or company.")
@@ -122,7 +113,7 @@ async def view_avail_seats(update: Update, context: CallbackContext) -> int:
     await update.message.reply_text("Please provide date in the format: " + date_format_example)
     return DATE
 
-
+# @handle_errors
 async def date(update: Update, context: CallbackContext) -> int:
     date_str = update.message.text
     data = load_data()
@@ -153,6 +144,7 @@ async def date(update: Update, context: CallbackContext) -> int:
     await update.message.reply_text(message)
     return ConversationHandler.END
 
+# @handle_errors
 async def cancel_view_avail_seats(update: Update, context: CallbackContext) -> int:
     await update.message.reply_text('View Available Seats canceled.', reply_markup=ReplyKeyboardRemove())
     return ConversationHandler.END
@@ -163,18 +155,7 @@ view_avail_seats_handler = ConversationHandler(
     fallbacks=[CommandHandler('restart', cancel_view_avail_seats)],
 )
 
-# 4. Add company (name, password, quota) (prevent duplicate names)
-# Define states
-COMPANY_NAME, COMPANY_PASSWORD, COMPANY_QUOTA = range(3)
-@handle_errors
-async def add_company(update: Update, context: CallbackContext) -> int:
-    if not check_if_logged_on_as_admin(update, context):
-        await update.message.reply_text("You are not logged in as an admin.")
-        return ConversationHandler.END
-    
-    """Starts the conversation to add a new company."""
-    new_company_id = None
-    data = load_data()
+async def get_new_company_id(data)->str:
     if data["discarded_company_id_nums"]:
         discarded_company_id_nums=data["discarded_company_id_nums"]
         min_id = min(discarded_company_id_nums)
@@ -185,12 +166,48 @@ async def add_company(update: Update, context: CallbackContext) -> int:
         next_company_id = new_company_id + 1
         data["next_company_id"] = str(next_company_id)#numerical id
         save_data(data)
+    return new_company_id
 
+# 4. Add company (name, password, quota) (prevent duplicate names)
+# Define states
+COMPANY_NAME, COMPANY_PASSWORD, COMPANY_QUOTA = range(3)
+# @handle_errors
+async def add_company(update: Update, context: CallbackContext) -> int:
+    """Starts the conversation to add a new company."""
+    if not check_if_logged_on_as_admin(update, context):
+        await update.message.reply_text("You are not logged in as an admin.")
+        return ConversationHandler.END
+    
+    data = load_data()
+
+    context.user_data["data"] = data
+    new_company_id = await get_new_company_id(data)
     context.user_data['company_id'] = new_company_id
     await update.message.reply_text("Please enter the name for the new company:")
     return COMPANY_NAME
 
-def add_company_and_quota_to_database(company_id, company_name, company_password, company_quota):
+# @handle_errors
+async def company_name(update: Update, context: CallbackContext) -> int:
+    """Stores the company name and asks for the password."""
+    company_name = update.message.text
+    data = context.user_data["data"]
+    if company_name in data["companies"]:
+        await update.message.reply_text("Company name already exists. Please enter a different name.")
+        return COMPANY_NAME
+    context.user_data['company_name'] = update.message.text
+
+    await update.message.reply_text("Please enter the company password:")
+    return COMPANY_PASSWORD
+
+# @handle_errors
+async def company_password(update: Update, context: CallbackContext) -> int:
+    """Stores the company password and asks for the quota."""
+    context.user_data['company_password'] = update.message.text
+    await update.message.reply_text("Please enter the company quota:")
+    return COMPANY_QUOTA
+
+# @handle_errors
+def add_company_and_quota_to_database(company_id: str, company_name, company_password, company_quota):
     data = load_data()
     data["companies"][company_id] = {
         "id": company_id,
@@ -203,23 +220,7 @@ def add_company_and_quota_to_database(company_id, company_name, company_password
     }
     save_data(data)
 
-async def company_name(update: Update, context: CallbackContext) -> int:
-    """Stores the company name and asks for the password."""
-    company_name = update.message.text
-    if company_name in load_data()["companies"]:
-        await update.message.reply_text("Company name already exists. Please enter a different name.")
-        return COMPANY_NAME
-    context.user_data['company_name'] = update.message.text
-
-    await update.message.reply_text("Please enter the company password:")
-    return COMPANY_PASSWORD
-
-async def company_password(update: Update, context: CallbackContext) -> int:
-    """Stores the company password and asks for the quota."""
-    context.user_data['company_password'] = update.message.text
-    await update.message.reply_text("Please enter the company quota:")
-    return COMPANY_QUOTA
-
+# @handle_errors
 async def company_quota(update: Update, context: CallbackContext) -> int:
     """Stores the company quota and ends the conversation."""
     context.user_data['company_quota'] = update.message.text
@@ -237,7 +238,6 @@ async def company_quota(update: Update, context: CallbackContext) -> int:
     return ConversationHandler.END
 
 
-
 add_company_handler = ConversationHandler(
     entry_points=[CommandHandler('add_company', add_company)],
     states={
@@ -250,7 +250,7 @@ add_company_handler = ConversationHandler(
 
 # 5. Delete company (by company id)
 DEL_COMPANY_ID = range(1)
-@handle_errors
+# @handle_errors
 async def delete_company(update: Update, context: CallbackContext) -> None:
     if not check_if_logged_on_as_admin(update, context):
         await update.message.reply_text("You are not logged in as an admin.")
@@ -260,6 +260,7 @@ async def delete_company(update: Update, context: CallbackContext) -> None:
     await update.message.reply_text("Please enter the id of the company to delete:")
     return DEL_COMPANY_ID
 
+# @handle_errors
 async def delete_company_id(update: Update, context: CallbackContext) -> int:
     """Deletes the company id if valid"""
     company_id = update.message.text
@@ -302,7 +303,7 @@ delete_company_handler = ConversationHandler(
 # 6. Edit company (by company id, edit quota/password)
 # Define states
 COMPANY_ID, EDIT_FIELD, EDIT_NAME, EDIT_PASSWORD, EDIT_QUOTA = range(5)
-@handle_errors
+# @handle_errors
 async def edit_company(update: Update, context: CallbackContext) -> int:
     if not check_if_logged_on_as_admin(update, context):
         await update.message.reply_text("You are not logged in as an admin.")
@@ -312,6 +313,7 @@ async def edit_company(update: Update, context: CallbackContext) -> int:
     await update.message.reply_text("Please enter the id of the company to edit:")
     return COMPANY_ID
 
+# @handle_errors
 async def company_id(update: Update, context: CallbackContext) -> int:
     """Stores the company id and asks what field to edit."""
     company_id = update.message.text
@@ -349,6 +351,7 @@ async def edit_field(update: Update, context: CallbackContext) -> int:
         await update.message.reply_text("Invalid input. Please enter 'name', 'password', 'quota', 'yes', or 'no'.")
         return EDIT_FIELD
     
+# @handle_errors
 async def edit_name(update: Update, context: CallbackContext) -> int:
     """Edits the company name."""
     # Here you would typically edit the company name in your database
@@ -360,6 +363,7 @@ async def edit_name(update: Update, context: CallbackContext) -> int:
     await update.message.reply_text("Company name edited successfully! Do you want to continue editing? (yes/no)")
     return EDIT_FIELD
 
+# @handle_errors
 async def edit_password(update: Update, context: CallbackContext) -> int:
     """Edits the company password."""
     data =  load_data()
@@ -370,6 +374,7 @@ async def edit_password(update: Update, context: CallbackContext) -> int:
     await update.message.reply_text("Company password edited successfully! Do you want to continue editing? (yes/no)")
     return EDIT_FIELD
 
+# @handle_errors
 async def edit_quota(update: Update, context: CallbackContext) -> int:
     """Edits the company quota."""
     data =  load_data()
@@ -380,6 +385,7 @@ async def edit_quota(update: Update, context: CallbackContext) -> int:
     await update.message.reply_text("Company quota edited successfully! Do you want to continue editing? (yes/no)")
     return EDIT_FIELD
 
+# @handle_errors
 async def cancel_edit_company(update: Update, context: CallbackContext) -> int:
     await update.message.reply_text('Edit Company canceled.', reply_markup=ReplyKeyboardRemove())
     return ConversationHandler.END
@@ -401,7 +407,7 @@ edit_company_handler = ConversationHandler(
 
 #7. View all companies (total quota, current quota used, company name, company password)
 #might make password not visible since privacy concern
-@handle_errors
+# @handle_errors
 async def view_all_companies(update: Update, context: CallbackContext) -> None:
     if not check_if_logged_on_as_admin(update, context):
         await update.message.reply_text("You are not logged in as an admin.")
@@ -419,6 +425,7 @@ async def view_all_companies(update: Update, context: CallbackContext) -> None:
         message += f"ID:{company['id']}, Name: {company['name']}, Password: {company['password']}, Total quota: {company_quota['total_quota']}, Quota used: {company_quota['quota_used']}\n"
     await update.message.reply_text(message)
 
+# @handle_errors
 async def view_all_seats(update: Update, context: CallbackContext) -> None:
     if not check_if_logged_on_as_admin(update, context):
         await update.message.reply_text("You are not logged in as an admin.")
@@ -441,7 +448,7 @@ async def view_all_seats(update: Update, context: CallbackContext) -> None:
     await update.message.reply_text(working_seats_message + "\n" + broken_seats_message)
 
 #8. View a specific company (by company id)
-# @handle_errors
+@handle_errors
 # async def view_company(update: Update, context: CallbackContext) -> None:
 #     if not check_if_logged_on_as_admin(update, context):
 #         await update.message.reply_text("You are not logged in as an admin.")
@@ -460,7 +467,7 @@ async def view_all_seats(update: Update, context: CallbackContext) -> None:
 #     await update.message.reply_text(f"Name: {company['name']}, Password: {company['password']}, Quota: {company['quota']}")
 #7. View all companies (total quota, current quota used, company name, company password)
 #might make password not visible since privacy concern
-@handle_errors
+# @handle_errors
 async def view_all_companies(update: Update, context: CallbackContext) -> None:
     if not check_if_logged_on_as_admin(update, context):
         await update.message.reply_text("You are not logged in as an admin.")
@@ -480,6 +487,7 @@ async def view_all_companies(update: Update, context: CallbackContext) -> None:
 
 
 #9. View all bookings
+# @handle_errors
 async def view_all_bookings(update: Update, context: CallbackContext) -> None:
     if not check_if_logged_on_as_admin(update, context):
         await update.message.reply_text("You are not logged in as an admin.")
@@ -500,7 +508,7 @@ async def view_all_bookings(update: Update, context: CallbackContext) -> None:
 
 #10. View a particular compnay's bookings
 BOOKING_COMPANY_ID = range(1)
-@handle_errors
+# @handle_errors
 async def view_company_booking(update: Update, context: CallbackContext) -> None:
     if not check_if_logged_on_as_admin(update, context):
         await update.message.reply_text("You are not logged in as an admin.")
@@ -510,6 +518,7 @@ async def view_company_booking(update: Update, context: CallbackContext) -> None
     await update.message.reply_text("Please enter the id of the company to view booking of:")
     return BOOKING_COMPANY_ID
 
+# @handle_errors
 async def view_booking_by_company_id(update: Update, context: CallbackContext) -> int:
     """Deletes the company id if valid"""
     company_id = update.message.text
@@ -529,6 +538,7 @@ async def view_booking_by_company_id(update: Update, context: CallbackContext) -
     await update.message.reply_text(message)
     return ConversationHandler.END
 
+# @handle_errors
 async def cancel_view_booking(update: Update, context: CallbackContext) -> int:
     await update.message.reply_text('View Booking by Company ID canceled.', reply_markup=ReplyKeyboardRemove())
     return ConversationHandler.END
