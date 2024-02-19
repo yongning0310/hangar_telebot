@@ -9,10 +9,11 @@ from general_command import ADMIN_PASSWORD, COMPANY_NAME, COMPANY_PASSWORD, admi
 from general_command import start, admin_login, company_login
 # from message_handler import handle_message
 from admin.command import add_seat, add_company_handler, edit_company_handler, view_all_companies, view_all_seats, delete_company_handler, mark_seat_handler, view_avail_seats_handler, view_company_booking_handler, view_all_bookings
-from config import TOKEN
 from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime, timedelta
+import os
 
+TOKEN = os.environ['TOKEN']
 
 logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO)
 logger = logging.getLogger(__name__)

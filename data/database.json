@@ -1,6 +1,9 @@
 {
     "next_company_id": "4",
-    "discarded_company_id_nums": [],
+    "discarded_company_id_nums": [
+        1,
+        2
+    ],
     "admin": {
         "id": "admin1",
         "password": "hangar_admin"
