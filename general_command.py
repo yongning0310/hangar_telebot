@@ -77,6 +77,7 @@ def is_valid_company_name(company_name: str) -> bool:
     data = load_data()
     return company_name.lower() in [data["companies"][company_id]["name"].lower() for company_id in data["companies"]]
 
+@handle_errors
 async def company_password_check(update: Update, context: CallbackContext) -> int:
     """Checks the company password."""
     company = context.user_data["company"]
@@ -100,6 +101,7 @@ async def company_password_check(update: Update, context: CallbackContext) -> in
         await update.message.reply_text("Incorrect password. Please try again.")
         return COMPANY_PASSWORD
 
+@handle_errors
 async def logout(update: Update, context: CallbackContext) -> None:
     context.user_data.clear()  # Clear user-specific data
     await update.message.reply_text("You have been logged out.")
