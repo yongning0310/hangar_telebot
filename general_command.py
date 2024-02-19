@@ -1,3 +1,4 @@
+from error_handler import handle_errors
 from telegram import Update, KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove, WebAppInfo
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters, CallbackContext, ConversationHandler
 from data.data import load_data
@@ -37,9 +38,10 @@ async def admin_password_check(update: Update, context: CallbackContext) -> int:
             "/add_company - Add a new company (For Admin).\n"
             "/delete_company - Delete a company (For Admin).\n"
             "/view_all_companies - List all companies (For Admin).\n"
-            "/view_company - View company details (For Admin).\n"
+            "/view_all_bookings - View company details (For Admin).\n"
             "/view_all_seats - List all seats (For Admin)."
         )
+
 
         context.user_data['role'] = 'admin'
         return ConversationHandler.END
@@ -53,6 +55,7 @@ async def company_login(update: Update, context: CallbackContext) -> int:
     await update.message.reply_text("Please enter your company name:")
     return COMPANY_NAME
 
+@handle_errors
 async def company_name_check(update: Update, context: CallbackContext) -> int:
     """Checks the company name and prompts for password."""
     input_company_name = update.message.text
@@ -70,7 +73,8 @@ async def company_name_check(update: Update, context: CallbackContext) -> int:
         await update.message.reply_text("Company name not recognized. Please try again.")
         return COMPANY_NAME
     
-async def is_valid_company_name(company_name: str) -> bool:
+def is_valid_company_name(company_name: str) -> bool:
+    #checks that name exists in the list of companies
     data = load_data()
     return company_name.lower() in [data["companies"][company_id]["name"].lower() for company_id in data["companies"]]
 
@@ -81,7 +85,16 @@ async def company_password_check(update: Update, context: CallbackContext) -> in
 
     if input_password == company["password"]:
         company_name = company["name"]
-        await update.message.reply_text(f"Authenticated as {company_name}")
+        await update.message.reply_text(
+            f"Company authenticated as {company_name}. Available commands:\n"
+            "/check_quota - Check Total and Used quota (For Company).\n"
+            "/view_avail_seats - View available seats (For Company).\n"
+            "/book_seats - Book seats (For Company).\n"
+            "/view_my_bookings - View existing bookings (For Company).\n"
+        )
+        
+
+
         context.user_data['role'] = 'company'
         return ConversationHandler.END
     else:

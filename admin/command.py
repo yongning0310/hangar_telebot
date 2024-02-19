@@ -1,7 +1,8 @@
+from company.command import check_if_logged_on_as_company
+from company.utils import is_valid_date_format, is_valid_date_range
 from telegram.ext import Application, CommandHandler, CallbackContext, ConversationHandler, MessageHandler, filters
 from data.data import load_data, save_data
 from telegram import Update, KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove
-from datetime import datetime, timedelta
 from error_handler import handle_errors
 
 date_format_example = "YYYY-MM-DD"
@@ -26,14 +27,30 @@ async def add_seat(update: Update, context: CallbackContext) -> int:
         await update.message.reply_text("You are not logged in as an admin.")
         return ConversationHandler.END
 
-    """Adds a seat to the database."""
+    # """Adds a seat to the database."""
+    # data = load_data()
+    # seat_id = str(len(data["seats"]) + 1)
+    # data["seats"][seat_id] = {
+    #     "is_broken": False
+    # }
+    # save_data(data)
+    # await update.message.reply_text(f"Seat {len(data['seats'])} added successfully.")
+    # return ConversationHandler.END
+    # Add the new seat to 'seats' with 'is_broken': False
     data = load_data()
     seat_id = str(len(data["seats"]) + 1)
-    data["seats"][seat_id] = {
-        "is_broken": False
-    }
+    data["seats"][seat_id] = {"is_broken": False}
+
+    # Iterate through each date and hour in 'dates' to update with the new seat
+    for date, hours in data["dates"].items():
+        for hour in hours.keys():
+            # Ensure every hour includes the new seat marked as not booked
+            if seat_id not in hours[hour]:
+                hours[hour][seat_id] = {"is_booked": False}
+
+    # Save the updated data
     save_data(data)
-    await update.message.reply_text(f"Seat {len(data['seats'])} added successfully.")
+    await update.message.reply_text(f"Seat {seat_id} added successfully and is now available for booking.")
     return ConversationHandler.END
 
 # 2. Mark seats as broken (by seat_id)
@@ -91,32 +108,20 @@ mark_seat_handler = ConversationHandler(
     entry_points=[CommandHandler('mark_seat_status', mark_seat_status)],
     states={SEAT_ID: [MessageHandler(filters.TEXT & ~filters.COMMAND, seat_id)],
             SEAT_STATUS: [MessageHandler(filters.TEXT & ~filters.COMMAND, seat_physical_status)]},
-    fallbacks=[CommandHandler('cancel', cancel_add_company)],
+    fallbacks=[CommandHandler('restart', cancel_add_company)],
 )
 # 3. View seats avail (by date)
 
 DATE = range(1)
 @handle_errors
 async def view_avail_seats(update: Update, context: CallbackContext) -> int:
-    if not check_if_logged_on_as_admin(update, context):
-        await update.message.reply_text("You are not logged in as an admin.")
+    if not (check_if_logged_on_as_admin(update, context) or check_if_logged_on_as_company(update, context)):
+        await update.message.reply_text("You are not logged in as an admin or company.")
         return ConversationHandler.END
     
     await update.message.reply_text("Please provide date in the format: " + date_format_example)
     return DATE
 
-def is_valid_date_format(date_str: str) -> bool:
-    try:
-        input_date = datetime.strptime(date_str, "%Y-%m-%d")
-    except ValueError:
-        return False
-    return True
-
-def is_valid_date_range(date_str: str, data) -> bool:
-    today = datetime.now().date()
-    max_date = today + timedelta(days=7)
-    input_date = datetime.strptime(date_str, "%Y-%m-%d").date()
-    return today <= input_date <= max_date and date_str in data["dates"]
 
 async def date(update: Update, context: CallbackContext) -> int:
     date_str = update.message.text
@@ -131,7 +136,7 @@ async def date(update: Update, context: CallbackContext) -> int:
         await update.message.reply_text(f"Date {date_str} is not within 7 days from today. Please enter a valid date.")
         return DATE
 
-    await update.message.reply_text(f"Available seats for {date_str}.")
+    await update.message.reply_text(f"Available seats for {date_str}. Every booking slot is 1 hour.")
     all_hours = data["dates"][date_str]
     seats_data = data["seats"]
     message = ""
@@ -155,7 +160,7 @@ async def cancel_view_avail_seats(update: Update, context: CallbackContext) -> i
 view_avail_seats_handler = ConversationHandler(
     entry_points=[CommandHandler('view_avail_seats', view_avail_seats)],
     states={DATE: [MessageHandler(filters.TEXT & ~filters.COMMAND, date)]},
-    fallbacks=[CommandHandler('cancel', cancel_view_avail_seats)],
+    fallbacks=[CommandHandler('restart', cancel_view_avail_seats)],
 )
 
 # 4. Add company (name, password, quota) (prevent duplicate names)
@@ -168,7 +173,20 @@ async def add_company(update: Update, context: CallbackContext) -> int:
         return ConversationHandler.END
     
     """Starts the conversation to add a new company."""
-    context.user_data['company_id'] = str(len(load_data()["companies"]) + 1)
+    new_company_id = None
+    data = load_data()
+    if data["discarded_company_id_nums"]:
+        discarded_company_id_nums=data["discarded_company_id_nums"]
+        min_id = min(discarded_company_id_nums)
+        discarded_company_id_nums.remove(min_id)
+        new_company_id = str(min_id)
+    else:
+        new_company_id = int(data["next_company_id"])
+        next_company_id = new_company_id + 1
+        data["next_company_id"] = str(next_company_id)#numerical id
+        save_data(data)
+
+    context.user_data['company_id'] = new_company_id
     await update.message.reply_text("Please enter the name for the new company:")
     return COMPANY_NAME
 
@@ -215,7 +233,7 @@ async def company_quota(update: Update, context: CallbackContext) -> int:
 
     add_company_and_quota_to_database(company_id, company_name, company_password, company_quota)
 
-    await update.message.reply_text("Company added successfully!")
+    await update.message.reply_text(f"Company with ID: {company_id}, Name: {company_name}, Total Quota: {company_quota} added successfully!")
     return ConversationHandler.END
 
 
@@ -227,7 +245,7 @@ add_company_handler = ConversationHandler(
         COMPANY_PASSWORD: [MessageHandler(filters.TEXT & ~filters.COMMAND, company_password)],
         COMPANY_QUOTA: [MessageHandler(filters.TEXT & ~filters.COMMAND, company_quota)]
     },
-    fallbacks=[CommandHandler('cancel', cancel_add_company)],
+    fallbacks=[CommandHandler('restart', cancel_add_company)],
 )
 
 # 5. Delete company (by company id)
@@ -253,15 +271,14 @@ async def delete_company_id(update: Update, context: CallbackContext) -> int:
         await update.message.reply_text(f"Company {company_id} does not exist. Enter a valid company id.")
         return DEL_COMPANY_ID
 
-    # should remove company from json and save to database
-    # remove from data["companies"]
-    #delete from data["bookings"]
+    if company_id in data["companies"]:
+        del data["companies"][company_id]
+    if company_id in data["quotas"]:
+        del data["quotas"][company_id]
+    if company_id in data["bookings"]:
+        del data["bookings"][company_id]
 
-
-    del data["companies"][company_id]
-    del data["quotas"][company_id]
-    del data["bookings"][company_id]
-
+    data["discarded_company_id_nums"].append(company_id) #add to discarded ids for reuse when add new company
     save_data(data)
     context.user_data['company_id'] = company_id
     await update.message.reply_text("Deleted successfully.")
@@ -277,7 +294,7 @@ delete_company_handler = ConversationHandler(
     states={
         DEL_COMPANY_ID: [MessageHandler(filters.TEXT & ~filters.COMMAND, delete_company_id)],
     },
-    fallbacks=[CommandHandler('cancel', cancel_delete_company)],  # You would need to define a 'cancel' function
+    fallbacks=[CommandHandler('restart', cancel_delete_company)],  # You would need to define a 'cancel' function
 )
 
 
@@ -378,7 +395,7 @@ edit_company_handler = ConversationHandler(
         EDIT_PASSWORD: [MessageHandler(filters.TEXT & ~filters.COMMAND, edit_password)],
         EDIT_QUOTA: [MessageHandler(filters.TEXT & ~filters.COMMAND, edit_quota)]
     },
-    fallbacks=[CommandHandler('cancel', cancel_edit_company)],  # You would need to define a 'cancel' function
+    fallbacks=[CommandHandler('restart', cancel_edit_company)],  # You would need to define a 'cancel' function
 )
 
 
@@ -394,7 +411,9 @@ async def view_all_companies(update: Update, context: CallbackContext) -> None:
     data = load_data()
     await update.message.reply_text("All companies:")
     message = ""
-    for company_id in data["companies"]:
+
+    # Sort by company id
+    for company_id in sorted(data["companies"], key=int):
         company = data["companies"][company_id]
         company_quota = data["quotas"][company_id]
         message += f"ID:{company['id']}, Name: {company['name']}, Password: {company['password']}, Total quota: {company_quota['total_quota']}, Quota used: {company_quota['quota_used']}\n"
@@ -422,20 +441,101 @@ async def view_all_seats(update: Update, context: CallbackContext) -> None:
     await update.message.reply_text(working_seats_message + "\n" + broken_seats_message)
 
 #8. View a specific company (by company id)
+# @handle_errors
+# async def view_company(update: Update, context: CallbackContext) -> None:
+#     if not check_if_logged_on_as_admin(update, context):
+#         await update.message.reply_text("You are not logged in as an admin.")
+#         return ConversationHandler.END
+    
+#     """Displays information about a specific company."""
+#     if not context.args:
+#         await update.message.reply_text("No company ID provided.")
+#         return
+#     company_id = context.args[0]
+#     data = load_data()
+#     if company_id not in data["companies"]:
+#         await update.message.reply_text(f"Company {company_id} does not exist.")
+#         return
+#     company = data["companies"][company_id]
+#     await update.message.reply_text(f"Name: {company['name']}, Password: {company['password']}, Quota: {company['quota']}")
+#7. View all companies (total quota, current quota used, company name, company password)
+#might make password not visible since privacy concern
 @handle_errors
-async def view_company(update: Update, context: CallbackContext) -> None:
+async def view_all_companies(update: Update, context: CallbackContext) -> None:
     if not check_if_logged_on_as_admin(update, context):
         await update.message.reply_text("You are not logged in as an admin.")
         return ConversationHandler.END
     
-    """Displays information about a specific company."""
-    if not context.args:
-        await update.message.reply_text("No company ID provided.")
-        return
-    company_id = context.args[0]
+    """Displays information about all companies."""
     data = load_data()
+    await update.message.reply_text("All companies:")
+    message = ""
+
+    # Sort by company id
+    for company_id in sorted(data["companies"], key=int):
+        company = data["companies"][company_id]
+        company_quota = data["quotas"][company_id]
+        message += f"ID:{company['id']}, Name: {company['name']}, Password: {company['password']}, Total quota: {company_quota['total_quota']}, Quota used: {company_quota['quota_used']}\n"
+    await update.message.reply_text(message)
+
+
+#9. View all bookings
+async def view_all_bookings(update: Update, context: CallbackContext) -> None:
+    if not check_if_logged_on_as_admin(update, context):
+        await update.message.reply_text("You are not logged in as an admin.")
+        return ConversationHandler.END
+    
+    """Displays information about all bookings."""
+    data = load_data()
+    all_bookings = data["bookings"]
+    message = ""
+    for company_id in all_bookings:
+        company_bookings = all_bookings[company_id]
+        message += f"Company ID: {company_id}\n"
+        for booking in company_bookings:
+            message += f"Date: {booking['date']}, Hour: {booking['hour']}, Seat ID: {booking['seat_id']}, Status: {booking['status']}\n"
+    await update.message.reply_text(message)
+
+#10. View a particular compnay's bookings
+BOOKING_COMPANY_ID = range(1)
+@handle_errors
+async def view_company_booking(update: Update, context: CallbackContext) -> None:
+    if not check_if_logged_on_as_admin(update, context):
+        await update.message.reply_text("You are not logged in as an admin.")
+        return ConversationHandler.END
+    
+    """Starts view booking conversation."""
+    await update.message.reply_text("Please enter the id of the company to view booking of:")
+    return BOOKING_COMPANY_ID
+
+async def view_booking_by_company_id(update: Update, context: CallbackContext) -> int:
+    """Deletes the company id if valid"""
+    company_id = update.message.text
+
+    # Load data
+    data = load_data()
+
     if company_id not in data["companies"]:
-        await update.message.reply_text(f"Company {company_id} does not exist.")
-        return
-    company = data["companies"][company_id]
-    await update.message.reply_text(f"Name: {company['name']}, Password: {company['password']}, Quota: {company['quota']}")
+        await update.message.reply_text(f"Company {company_id} does not exist. Enter a valid company id.")
+        return BOOKING_COMPANY_ID
+
+    all_bookings = data["bookings"][company_id]
+    await update.message.reply_text(f"Bookings for company {company_id}:")
+    message = ""
+    for booking in all_bookings:
+        message += f"Date: {booking['date']}, Hour: {booking['hour']}, Seat ID: {booking['seat_id']}, Status: {booking['status']}\n"
+    await update.message.reply_text(message)
+    return ConversationHandler.END
+
+async def cancel_view_booking(update: Update, context: CallbackContext) -> int:
+    await update.message.reply_text('View Booking by Company ID canceled.', reply_markup=ReplyKeyboardRemove())
+    return ConversationHandler.END
+
+# Define the conversation handler
+view_company_booking_handler = ConversationHandler(
+    entry_points=[CommandHandler('view_company_booking', view_company_booking)],
+    states={
+        BOOKING_COMPANY_ID: [MessageHandler(filters.TEXT & ~filters.COMMAND, view_booking_by_company_id)],
+    },
+    fallbacks=[CommandHandler('restart', cancel_view_booking)],  # You would need to define a 'cancel' function
+)

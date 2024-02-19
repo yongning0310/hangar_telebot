@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 import json
 import logging
-from company.command import book_seats, check_quota, view_my_bookings
+from company.command import check_quota, view_my_bookings, book_seats_handler
 from telegram import Update, KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove, WebAppInfo
 from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters, CallbackContext, ConversationHandler
 from data.data import load_data, save_data
 from general_command import ADMIN_PASSWORD, COMPANY_NAME, COMPANY_PASSWORD, admin_password_check, company_name_check, company_password_check, start, admin_login, company_login, logout
 from general_command import start, admin_login, company_login
 # from message_handler import handle_message
-from admin.command import add_seat, add_company_handler, edit_company_handler, view_all_companies, view_company, view_all_seats, delete_company_handler, mark_seat_handler, view_avail_seats_handler
+from admin.command import add_seat, add_company_handler, edit_company_handler, view_all_companies, view_all_seats, delete_company_handler, mark_seat_handler, view_avail_seats_handler, view_company_booking_handler, view_all_bookings
 from config import TOKEN
 from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime, timedelta
@@ -23,7 +23,7 @@ admin_conversation_handler = ConversationHandler(
     states={
         ADMIN_PASSWORD: [MessageHandler(filters.TEXT & ~filters.COMMAND, admin_password_check)],
     },
-    fallbacks=[]
+    fallbacks=[CommandHandler('restart', logout)]
 )
 
 # Define conversation handler for company login
@@ -33,16 +33,37 @@ company_conversation_handler = ConversationHandler(
         COMPANY_NAME: [MessageHandler(filters.TEXT & ~filters.COMMAND, company_name_check)],
         COMPANY_PASSWORD: [MessageHandler(filters.TEXT & ~filters.COMMAND, company_password_check)],
     },
-    fallbacks=[]
+    fallbacks=[CommandHandler('restart', logout)]
 )
 
+def reset_data():
+    '''reset the data to the initial state'''
+    logger.info("Resetting data")
+    data = load_data()
+    #next-id
+    data["next_company_id"] = "1"
+    #discarded_id
+    data["discarded_company_id_nums"] = []
+    #admin
+    data["admin"] = { "id": "admin1", "password": "hangar_admin" }
+    #companies
+    data["companies"] = {} #company id to its info
+    #dates
+    data["dates"] = {} #date to its hours
+    #seats
+    data["seats"] = {} #seat id to its info
+    #bookings
+    data["bookings"] = {} #company id to its bookings
+    #quotas
+    data["quotas"] = {} #company id to its quotas
+    save_data(data)
+    add_new_dates(14)
 
-
-def add_new_dates():
-    # Adds new dates for the next 7 days to the database, initializing the seats for each date and hour
+def add_new_dates(num_days=7):
+    # Adds new dates for the next 14 days to the database, initializing the seats for each date and hour
     data = load_data()
     dates = data['dates']
-    for i in range(7):
+    for i in range(num_days):
         date = (datetime.now() + timedelta(days=i)).strftime('%Y-%m-%d')
         if date not in dates:
             dates[date] = {}
@@ -64,6 +85,7 @@ def add_new_dates():
         del dates[date]
     
 def main():
+    reset_data()
     application = Application.builder().token(TOKEN).build()
 
     # Command handlers
@@ -71,6 +93,7 @@ def main():
     application.add_handler(CommandHandler("logout", logout))
     application.add_handler(admin_conversation_handler)
     application.add_handler(company_conversation_handler)
+    
     data = load_data()
 
     # # Placeholder handlers for admin and company commands
@@ -81,12 +104,14 @@ def main():
     application.add_handler(delete_company_handler)
     application.add_handler(edit_company_handler)
     application.add_handler(CommandHandler('view_all_companies', view_all_companies)) 
-    application.add_handler(CommandHandler('view_company', view_company)) # edit this 
     application.add_handler(CommandHandler('view_all_seats', view_all_seats))
+    application.add_handler(CommandHandler('view_all_bookings', view_all_bookings))
+    
+    application.add_handler(view_company_booking_handler)
     # application.add_handler(CommandHandler("book_seat", book_seat))
         # # Placeholder handlers for admin and company commands
     application.add_handler(CommandHandler("check_quota", check_quota)) 
-    application.add_handler(CommandHandler("book_seats", book_seats)) # complete this
+    application.add_handler(book_seats_handler) 
     application.add_handler(CommandHandler("view_my_bookings", view_my_bookings))
 
     # Start the scheduler
@@ -94,7 +119,7 @@ def main():
     scheduler.add_job(add_new_dates, 'interval', weeks=1, start_date=next_monday())
     scheduler.start()
 
-    add_new_dates()
+    # add_new_dates()
     application.run_polling()
 
 def next_monday():
