@@ -85,7 +85,7 @@ async def company_name_check(update: Update, context: CallbackContext) -> int:
     if is_valid_company_name(input_company_name):
         #should only have one company that is a match, thus use "next"
         company_list = [data["companies"][company_id] for company_id in data["companies"]]
-        context.user_data["company"] = next((company for company in company_list if company["name"].lower() == input_company_name.lower()), None)
+        context.user_data["company"] = next(company for company in company_list if company["name"].lower() == input_company_name.lower())
         await update.message.reply_text("Please enter your company password:")
         return COMPANY_PASSWORD
     else:

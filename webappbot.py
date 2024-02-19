@@ -11,9 +11,9 @@ from admin.command import add_seat, add_company_handler, edit_company_handler, v
 from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime, timedelta
 import os
-from config import TOKEN
+# from config import TOKEN
 
-# TOKEN = os.environ['TOKEN']
+TOKEN = os.environ['TOKEN']
 
 logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO)
 logger = logging.getLogger(__name__)
