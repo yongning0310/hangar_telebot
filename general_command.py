@@ -26,7 +26,7 @@ async def admin_login(update: Update, context: CallbackContext) -> int:
 async def admin_password_check(update: Update, context: CallbackContext) -> int:
     """Checks the admin password."""
     text = update.message.text
-    if text == data['admin'][0]['password']:  # Replace with your actual admin password
+    if text == data['admin']['password']:  # Replace with your actual admin password
         #how to have a multi-line message?
 
         await update.message.reply_text(
@@ -65,8 +65,7 @@ async def company_name_check(update: Update, context: CallbackContext) -> int:
     if is_valid_company_name(input_company_name):
         #should only have one company that is a match, thus use "next"
         company_list = [data["companies"][company_id] for company_id in data["companies"]]
-        context.user_data["company"] = next(company for company in company_list if company["name"].lower() == input_company_name.lower())
-
+        context.user_data["company"] = next((company for company in company_list if company["name"].lower() == input_company_name.lower()), None)
         await update.message.reply_text("Please enter your company password:")
         return COMPANY_PASSWORD
     else:
@@ -104,3 +103,4 @@ async def company_password_check(update: Update, context: CallbackContext) -> in
 async def logout(update: Update, context: CallbackContext) -> None:
     context.user_data.clear()  # Clear user-specific data
     await update.message.reply_text("You have been logged out.")
+    return ConversationHandler.END

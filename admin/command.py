@@ -491,8 +491,10 @@ async def view_all_bookings(update: Update, context: CallbackContext) -> None:
     message = ""
     for company_id in all_bookings:
         company_bookings = all_bookings[company_id]
+        # Sort the bookings by date, hour, and seat ID
+        sorted_company_bookings = sorted(company_bookings, key=lambda k: (k['date'], k['hour'], k['seat_id']))
         message += f"Company ID: {company_id}\n"
-        for booking in company_bookings:
+        for booking in sorted_company_bookings:
             message += f"Date: {booking['date']}, Hour: {booking['hour']}, Seat ID: {booking['seat_id']}, Status: {booking['status']}\n"
     await update.message.reply_text(message)
 

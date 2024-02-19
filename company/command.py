@@ -162,13 +162,14 @@ async def view_my_bookings(update: Update, context: CallbackContext) -> int:
     """Displays all existing bookings for the company."""
     data = load_data()
     company_id = str(context.user_data["company"]["id"])
-    # {'company1': [{'date': '2024-02-20', 'hour': '09:00', 'seat_id': 'seat1'}, {'date': '2024-02-20', 'hour': '09:00', 'seat_id': 'seat2'}, 
-    # {'date': '2024-02-20', 'hour': '09:00', 'seat_id': 'seat3'}], 'company2': [{'date': '2024-02-20', 'hour': '09:00', 'seat_id': 'seat2'}]}
-    # the line below is wrong, what should it be 
     bookings = data["bookings"].get(company_id)
     if not bookings:
         await update.message.reply_text("No existing bookings.")
         return ConversationHandler.END
-    bookings_str = "\n".join([f"Seat {booking['seat_id']} on {booking['date']} at {booking['hour']}" for booking in bookings])
+
+    # Sort the bookings by date, hour, and seat ID
+    sorted_bookings = sorted(bookings, key=lambda k: (k['date'], k['hour'], k['seat_id']))
+
+    bookings_str = "\n".join([f"Seat {booking['seat_id']} on {booking['date']} at {booking['hour']}" for booking in sorted_bookings])
     await update.message.reply_text(f"Existing bookings:\n{bookings_str}")
     return ConversationHandler.END

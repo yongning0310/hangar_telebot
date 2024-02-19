@@ -85,7 +85,7 @@ def add_new_dates(num_days=7):
         del dates[date]
     
 def main():
-    reset_data()
+    # reset_data()
     application = Application.builder().token(TOKEN).build()
 
     # Command handlers
