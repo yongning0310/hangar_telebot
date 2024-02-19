@@ -2,10 +2,9 @@
 import json
 import logging
 from company.command import check_quota, view_my_bookings, book_seats_handler
-from telegram import Update, KeyboardButton, ReplyKeyboardMarkup, ReplyKeyboardRemove, WebAppInfo
-from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandler, filters, CallbackContext, ConversationHandler
+from telegram.ext import Application, CommandHandler
 from data.data import load_data, save_data
-from general_command import ADMIN_PASSWORD, COMPANY_NAME, COMPANY_PASSWORD, admin_password_check, company_name_check, company_password_check, start, admin_login, company_login, logout
+from general_command import admin_conversation_handler, company_conversation_handler, start, logout
 from general_command import start, admin_login, company_login
 # from message_handler import handle_message
 from admin.command import add_seat, add_company_handler, edit_company_handler, view_all_companies, view_all_seats, delete_company_handler, mark_seat_handler, view_avail_seats_handler, view_company_booking_handler, view_all_bookings
@@ -18,25 +17,6 @@ from config import TOKEN
 
 logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO)
 logger = logging.getLogger(__name__)
-
-# Define conversation handler for admin login
-admin_conversation_handler = ConversationHandler(
-    entry_points=[CommandHandler('admin', admin_login)],
-    states={
-        ADMIN_PASSWORD: [MessageHandler(filters.TEXT & ~filters.COMMAND, admin_password_check)],
-    },
-    fallbacks=[CommandHandler('restart', logout)]
-)
-
-# Define conversation handler for company login
-company_conversation_handler = ConversationHandler(
-    entry_points=[CommandHandler('company', company_login)],
-    states={
-        COMPANY_NAME: [MessageHandler(filters.TEXT & ~filters.COMMAND, company_name_check)],
-        COMPANY_PASSWORD: [MessageHandler(filters.TEXT & ~filters.COMMAND, company_password_check)],
-    },
-    fallbacks=[CommandHandler('restart', logout)]
-)
 
 def reset_data():
     '''reset the data to the initial state'''
@@ -85,20 +65,14 @@ def add_new_dates(num_days=7):
             dates_to_delete.append(date)
     for date in dates_to_delete:
         del dates[date]
-    
-def main():
-    # reset_data()
-    application = Application.builder().token(TOKEN).build()
 
-    # Command handlers
+def add_login_handlers(application):
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("logout", logout))
     application.add_handler(admin_conversation_handler)
     application.add_handler(company_conversation_handler)
-    
-    data = load_data()
 
-    # # Placeholder handlers for admin and company commands
+def add_admin_handlers(application):
     application.add_handler(CommandHandler('add_seat', add_seat))
     application.add_handler(mark_seat_handler)
     application.add_handler(view_avail_seats_handler)
@@ -108,20 +82,27 @@ def main():
     application.add_handler(CommandHandler('view_all_companies', view_all_companies)) 
     application.add_handler(CommandHandler('view_all_seats', view_all_seats))
     application.add_handler(CommandHandler('view_all_bookings', view_all_bookings))
-    
     application.add_handler(view_company_booking_handler)
-    # application.add_handler(CommandHandler("book_seat", book_seat))
-        # # Placeholder handlers for admin and company commands
+
+def add_company_handlers(application):
     application.add_handler(CommandHandler("check_quota", check_quota)) 
     application.add_handler(book_seats_handler) 
     application.add_handler(CommandHandler("view_my_bookings", view_my_bookings))
 
-    # Start the scheduler
+def main():
+    application = Application.builder().token(TOKEN).build()
+
+    add_login_handlers(application)
+    add_admin_handlers(application)
+    add_company_handlers(application)
+
+    data = load_data()
+
+    # Start the scheduler to add new dates every 14 days
     scheduler = BackgroundScheduler()
     scheduler.add_job(add_new_dates, 'interval', weeks=1, start_date=next_monday())
     scheduler.start()
 
-    # add_new_dates()
     application.run_polling()
 
 def next_monday():

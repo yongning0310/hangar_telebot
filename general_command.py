@@ -4,8 +4,16 @@ from telegram.ext import Application, CommandHandler, ContextTypes, MessageHandl
 from data.data import load_data
 
 # Define states for each conversation
-ADMIN_PASSWORD, COMPANY_NAME, COMPANY_PASSWORD = range(3)
+ADMIN_PASSWORD = range(1)
 data = load_data()
+ENTER_COMPANY_NAME_AGAIN = "Please enter your company name again."
+ENTER_PASSWORD_AGAIN = "Please enter your password again."
+
+# @handle_errors
+async def logout(update: Update, context: CallbackContext) -> None:
+    context.user_data.clear()  # Clear user-specific data
+    await update.message.reply_text("You have been logged out.")
+    return ConversationHandler.END
 
 # Command Handlers
 async def start(update: Update, context: CallbackContext) -> None:
@@ -46,16 +54,28 @@ async def admin_password_check(update: Update, context: CallbackContext) -> int:
         context.user_data['role'] = 'admin'
         return ConversationHandler.END
     else:
-        await update.message.reply_text("Incorrect password. Please try again.")
+        await update.message.reply_text("Incorrect password. " + ENTER_PASSWORD_AGAIN)
         return ADMIN_PASSWORD
+    
+# Define conversation handler for admin login
+admin_conversation_handler = ConversationHandler(
+    entry_points=[CommandHandler('admin', admin_login)],
+    states={
+        ADMIN_PASSWORD: [MessageHandler(filters.TEXT & ~filters.COMMAND, admin_password_check)],
+    },
+    fallbacks=[CommandHandler('restart', logout)]
+)
 
+##############################################################################################################################################################################
+
+GENERAL_COMPANY_NAME, COMPANY_PASSWORD = range(2)
 # Company Handlers
 async def company_login(update: Update, context: CallbackContext) -> int:
     """Prompts for company name."""
     await update.message.reply_text("Please enter your company name:")
-    return COMPANY_NAME
+    return GENERAL_COMPANY_NAME
 
-@handle_errors
+# @handle_errors
 async def company_name_check(update: Update, context: CallbackContext) -> int:
     """Checks the company name and prompts for password."""
     input_company_name = update.message.text
@@ -69,15 +89,15 @@ async def company_name_check(update: Update, context: CallbackContext) -> int:
         await update.message.reply_text("Please enter your company password:")
         return COMPANY_PASSWORD
     else:
-        await update.message.reply_text("Company name not recognized. Please try again.")
-        return COMPANY_NAME
+        await update.message.reply_text("Company name not recognized. " + ENTER_COMPANY_NAME_AGAIN)
+        return GENERAL_COMPANY_NAME
     
 def is_valid_company_name(company_name: str) -> bool:
     #checks that name exists in the list of companies
     data = load_data()
     return company_name.lower() in [data["companies"][company_id]["name"].lower() for company_id in data["companies"]]
 
-@handle_errors
+# @handle_errors
 async def company_password_check(update: Update, context: CallbackContext) -> int:
     """Checks the company password."""
     company = context.user_data["company"]
@@ -93,16 +113,19 @@ async def company_password_check(update: Update, context: CallbackContext) -> in
             "/view_my_bookings - View existing bookings (For Company).\n"
         )
         
-
-
         context.user_data['role'] = 'company'
         return ConversationHandler.END
     else:
-        await update.message.reply_text("Incorrect password. Please try again.")
+        await update.message.reply_text("Incorrect password. " + ENTER_PASSWORD_AGAIN)
         return COMPANY_PASSWORD
 
-@handle_errors
-async def logout(update: Update, context: CallbackContext) -> None:
-    context.user_data.clear()  # Clear user-specific data
-    await update.message.reply_text("You have been logged out.")
-    return ConversationHandler.END
+
+# Define conversation handler for company login
+company_conversation_handler = ConversationHandler(
+    entry_points=[CommandHandler('company', company_login)],
+    states={
+        GENERAL_COMPANY_NAME: [MessageHandler(filters.TEXT & ~filters.COMMAND, company_name_check)],
+        COMPANY_PASSWORD: [MessageHandler(filters.TEXT & ~filters.COMMAND, company_password_check)],
+    },
+    fallbacks=[CommandHandler('restart', logout)]
+)

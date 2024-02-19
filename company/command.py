@@ -17,9 +17,8 @@ def check_if_logged_on_as_company(update: Update, context: CallbackContext) -> b
     else:
         return False
 
-
 # 1. Check quota
-@handle_errors
+# @handle_errors
 async def check_quota(update: Update, context: CallbackContext) -> int:
     if not check_if_logged_on_as_company(update, context):
         await update.message.reply_text("You are not logged in as a company.")
@@ -37,7 +36,7 @@ async def check_quota(update: Update, context: CallbackContext) -> int:
 
 # 2. Book seats
 DATE, BOOKING = range(2)
-@handle_errors
+# @handle_errors
 async def book_seats(update: Update, context: CallbackContext) -> int:
     if not check_if_logged_on_as_company(update, context):
         await update.message.reply_text("You are not logged in as a company.")
@@ -101,7 +100,7 @@ async def booking(update: Update, context: CallbackContext) -> int:
             if str(hour) not in list(data["dates"][date_str].keys()):
                 await update.message.reply_text(f"Invalid hour: {hour}.")
                 return BOOKING
-            if not is_available_seat(seat_id, hour, date_str, data):
+            if not await is_available_seat(seat_id, hour, date_str, data):
                 await update.message.reply_text(f"Seat {seat_id} at {hour} on {date_str} is not available.")
                 return BOOKING
     
@@ -137,7 +136,7 @@ async def booking(update: Update, context: CallbackContext) -> int:
     await update.message.reply_text(f"All seats have been booked for all the entered hours. Here are the details:\n" + "\n".join(booked_seats_times))
     return ConversationHandler.END
 
-def is_available_seat(seat_id: str, hour: str, date: str, data) -> bool:
+async def is_available_seat(seat_id: str, hour: str, date: str, data) -> bool:
     return data["dates"][date][hour][seat_id]["is_booked"] == False and data["seats"][seat_id]["is_broken"] == False
 
 
@@ -153,7 +152,7 @@ book_seats_handler = ConversationHandler(
 )
 
 # 3. View existing bookings
-@handle_errors
+# @handle_errors
 async def view_my_bookings(update: Update, context: CallbackContext) -> int:
     if not check_if_logged_on_as_company(update, context):
         await update.message.reply_text("You are not logged in as a company.")
