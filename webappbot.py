@@ -12,6 +12,7 @@ from admin.command import add_seat, add_company_handler, edit_company_handler, v
 from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime, timedelta
 import os
+# from config import TOKEN
 
 TOKEN = os.environ['TOKEN']
 

@@ -11,8 +11,8 @@
     "companies": {
         "3": {
             "id": 3,
-            "name": "100",
-            "password": "100"
+            "name": "test",
+            "password": "test"
         }
     },
     "dates": {
