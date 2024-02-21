@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import json
 import logging
-from company.command import check_quota, view_my_bookings, book_seats_handler
+from company.command import check_quota, view_my_bookings, book_seats_handler, cancel_booking_handler
 from telegram.ext import Application, CommandHandler
 from data.data import load_data, save_data
 from general_command import admin_conversation_handler, company_conversation_handler, start, logout
@@ -11,9 +11,9 @@ from admin.command import add_seat, add_company_handler, edit_company_handler, v
 from apscheduler.schedulers.background import BackgroundScheduler
 from datetime import datetime, timedelta
 import os
-# from config import TOKEN
+from config import TOKEN
 
-TOKEN = os.environ['TOKEN']
+# TOKEN = os.environ['TOKEN']
 
 logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -41,6 +41,7 @@ def reset_data():
     save_data(data)
     add_new_dates(14)
 
+# havent tested this yet
 def add_new_dates(num_days=7):
     # Adds new dates for the next 14 days to the database, initializing the seats for each date and hour
     data = load_data()
@@ -57,7 +58,6 @@ def add_new_dates(num_days=7):
                     if data['seats'][seat_id]['is_broken'] == True:
                         continue
                     dates[date][hour_str][seat_id] = {"is_booked": False}
-    save_data(data)
     # Clean up last week's dates
     dates_to_delete = []
     for date in dates:
@@ -65,6 +65,25 @@ def add_new_dates(num_days=7):
             dates_to_delete.append(date)
     for date in dates_to_delete:
         del dates[date]
+
+
+    # this should delete all bookings for the dates that are deleted 
+    # this should also recover the quotas for the dates deleted 
+    bookings_to_delete = []
+    for company_id in data['bookings']:
+        for booking in data['bookings'][company_id]:
+            if booking['date'] in dates_to_delete:
+                bookings_to_delete.append(booking)
+    
+    data['quotas'][booking['company_id']] += len(bookings_to_delete)
+
+    # quota should be added all at once 
+    for booking in bookings_to_delete:
+        data['bookings'][booking['company_id']].remove(booking)
+
+
+    save_data(data)
+
 
 def add_login_handlers(application):
     application.add_handler(CommandHandler("start", start))
@@ -88,6 +107,8 @@ def add_company_handlers(application):
     application.add_handler(CommandHandler("check_quota", check_quota)) 
     application.add_handler(book_seats_handler) 
     application.add_handler(CommandHandler("view_my_bookings", view_my_bookings))
+    application.add_handler(cancel_booking_handler)
+
 
 def main():
     application = Application.builder().token(TOKEN).build()

@@ -57,6 +57,8 @@ async def admin_password_check(update: Update, context: CallbackContext) -> int:
         await update.message.reply_text("Incorrect password. " + ENTER_PASSWORD_AGAIN)
         return ADMIN_PASSWORD
     
+
+
 # Define conversation handler for admin login
 admin_conversation_handler = ConversationHandler(
     entry_points=[CommandHandler('admin', admin_login)],
@@ -79,15 +81,23 @@ async def company_login(update: Update, context: CallbackContext) -> int:
 async def company_name_check(update: Update, context: CallbackContext) -> int:
     """Checks the company name and prompts for password."""
     input_company_name = update.message.text
-    # Check if the company name is in the list of companies (case-insensitive)
-
-    # print(data["companies"])
+    data = load_data()  # Ensure data is loaded here
+    
+    # Check if the company name is valid
     if is_valid_company_name(input_company_name):
-        #should only have one company that is a match, thus use "next"
-        company_list = [data["companies"][company_id] for company_id in data["companies"]]
-        context.user_data["company"] = next(company for company in company_list if company["name"].lower() == input_company_name.lower())
-        await update.message.reply_text("Please enter your company password:")
-        return COMPANY_PASSWORD
+        try:
+            # Directly find the matching company without creating a separate list
+            matching_company = next(
+                company for company_id, company in data["companies"].items()
+                if company["name"].lower() == input_company_name.lower()
+            )
+            context.user_data["company"] = matching_company
+            await update.message.reply_text("Please enter your company password:")
+            return COMPANY_PASSWORD
+        except StopIteration:
+            # Handle the case where no company matches (should not happen due to the earlier check)
+            await update.message.reply_text("An unexpected error occurred. Please try again.")
+            return GENERAL_COMPANY_NAME
     else:
         await update.message.reply_text("Company name not recognized. " + ENTER_COMPANY_NAME_AGAIN)
         return GENERAL_COMPANY_NAME
@@ -110,6 +120,7 @@ async def company_password_check(update: Update, context: CallbackContext) -> in
             "/check_quota - Check Total and Used quota (For Company).\n"
             "/view_avail_seats - View available seats (For Company).\n"
             "/book_seats - Book seats (For Company).\n"
+            "/cancel_booking - Cancel seats bookings (For Company).\n"
             "/view_my_bookings - View existing bookings (For Company).\n"
         )
         

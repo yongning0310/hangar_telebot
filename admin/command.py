@@ -216,7 +216,7 @@ def add_company_and_quota_to_database(company_id: str, company_name, company_pas
         "password": company_password
     }
     data["quotas"][company_id] = {
-        "total_quota": company_quota,
+        "total_quota":int(company_quota),
         "quota_used": 0
     }
     save_data(data)
